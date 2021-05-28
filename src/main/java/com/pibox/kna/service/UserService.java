@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import static com.pibox.kna.constants.UserConstant.*;
@@ -28,13 +29,15 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MailService mailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       BCryptPasswordEncoder bCryptPasswordEncoder) {
+                       MailService mailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.mailService = mailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -50,7 +53,7 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException {
+    public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, username, email);
         User user = new User();
         String password = generatePassword();
@@ -62,7 +65,7 @@ public class UserService implements UserDetailsService {
         user.setActive(true);
         user.addRole(roleRepository.findRoleByName("admin"));
         userRepository.save(user);
-        System.out.println(password);
+        mailService.sendNewPasswordEmail(firstName, password, email);
         return user;
     }
 
