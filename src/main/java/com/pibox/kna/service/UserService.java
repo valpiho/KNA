@@ -4,7 +4,7 @@ import com.pibox.kna.domain.Client;
 import com.pibox.kna.domain.Driver;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
-import com.pibox.kna.domain.form.RegistrationForm;
+import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.EmailExistException;
 import com.pibox.kna.exceptions.domain.UserNotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
@@ -64,7 +64,7 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public void register(RegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+    public void register(UserRegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, regForm.getUsername(), regForm.getPrivateEmail());
         User user = new User();
         String password = generatePassword();

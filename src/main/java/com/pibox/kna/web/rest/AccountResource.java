@@ -3,14 +3,12 @@ package com.pibox.kna.web.rest;
 import com.pibox.kna.domain.HttpResponse;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
-import com.pibox.kna.domain.form.RegistrationForm;
+import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.EmailExistException;
 import com.pibox.kna.exceptions.domain.UserNotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.UserService;
-import com.pibox.kna.service.dto.ClientDTO;
-import com.pibox.kna.service.dto.DriverDTO;
 import com.pibox.kna.service.dto.UserDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +44,7 @@ public class AccountResource {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<HttpResponse> register(@RequestBody RegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+    public ResponseEntity<HttpResponse> register(@RequestBody UserRegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         userService.register(regForm);
         return new ResponseEntity<>(new HttpResponse(201, CREATED, "User has been registered"), OK);
     }
@@ -62,18 +60,23 @@ public class AccountResource {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") String username) {
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable(value = "username") String username) {
         UserDTO user = userService.getUserByUsername(username);
         return new ResponseEntity<>(user, OK);
     }
 
+    @GetMapping
+    public ResponseEntity<UserDTO> getUser(@RequestHeader("Authorization") String token) {
+        String username = jwtTokenProvider.getUsernameFromDecodedToken(token);
+        UserDTO user = userService.getUserByUsername(username);
+        return new ResponseEntity<>(user, OK);
+    }
 
     // TODO: /update
     // TODO: /find/{username}
     // TODO: /list
     // TODO: /reset-password/{email}
     // TODO: /delete/{username}
-
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, message), httpStatus);

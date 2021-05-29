@@ -3,6 +3,7 @@ package com.pibox.kna.security.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.pibox.kna.domain.UserPrincipal;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +59,11 @@ public class JWTTokenProvider {
     public String getSubject(String token) {
         JWTVerifier verifier = getJWTVerifier();
         return verifier.verify(token).getSubject();
+    }
+
+    public String getUsernameFromDecodedToken(String token) {
+        DecodedJWT jwt = JWT.decode(token.split("\\s+")[1]);
+        return jwt.getSubject();
     }
 
     private boolean isTokenExpired(JWTVerifier verifier, String token) {
