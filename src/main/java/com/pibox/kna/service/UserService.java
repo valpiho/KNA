@@ -1,14 +1,19 @@
 package com.pibox.kna.service;
 
+import com.pibox.kna.domain.Client;
+import com.pibox.kna.domain.Driver;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
+import com.pibox.kna.domain.form.RegistrationForm;
 import com.pibox.kna.exceptions.domain.EmailExistException;
 import com.pibox.kna.exceptions.domain.UserNotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.repository.RoleRepository;
 import com.pibox.kna.repository.UserRepository;
+import com.pibox.kna.service.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
+
+import java.util.Date;
 
 import static com.pibox.kna.constants.UserConstant.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -30,14 +37,18 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MailService mailService;
+    private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       MailService mailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+                       MailService mailService,
+                       ModelMapper modelMapper,
+                       BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.mailService = mailService;
+        this.modelMapper = modelMapper;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -53,20 +64,38 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
-        validateNewUsernameAndEmail(EMPTY, username, email);
+    public void register(RegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+        validateNewUsernameAndEmail(EMPTY, regForm.getUsername(), regForm.getPrivateEmail());
         User user = new User();
         String password = generatePassword();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
-        user.setEmail(email);
+        user.setFirstName(regForm.getFirstName());
+        user.setLastName(regForm.getLastName());
+        user.setUsername(regForm.getUsername());
+        user.setEmail(regForm.getPrivateEmail());
         user.setPassword(encodePassword(password));
         user.setActive(true);
-        user.addRole(roleRepository.findRoleByName("admin"));
+        user.setJoinDate(new Date());
+        if (regForm.isClientOrDriver()) {
+            user.addRole(roleRepository.findRoleByName("client"));
+            user.setClient(new Client(
+                    regForm.getCompanyEmail(),
+                    regForm.getPhoneNumber(),
+                    regForm.getCountry(),
+                    regForm.getCity(),
+                    regForm.getStreetAddress(),
+                    regForm.getZipCode()));
+        } else {
+            user.addRole(roleRepository.findRoleByName("driver"));
+            user.setDriver(new Driver(regForm.getPlateNumber()));
+        }
         userRepository.save(user);
-        mailService.sendNewPasswordEmail(firstName, password, email);
-        return user;
+        mailService.sendNewPasswordEmail(regForm.getFirstName(), password, regForm.getPrivateEmail());
+        System.out.println(password);
+    }
+
+    public UserDTO getUserByUsername(String username) {
+        User user = findUserByUsername(username);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     public User findUserByUsername(String username) {

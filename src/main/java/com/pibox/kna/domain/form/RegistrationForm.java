@@ -1,21 +1,23 @@
-package com.pibox.kna.service.dto;
+package com.pibox.kna.domain.form;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
-public class ClientDTO {
+@Setter
+public class RegistrationForm {
 
     private String username;
     private String firstName;
     private String lastName;
-    private String userEmail;
-    private String email;
+    private String privateEmail;
+    @JsonProperty private boolean isClientOrDriver;
+    private String plateNumber;
+    private String companyEmail;
     private String phoneNumber;
     private String country;
     private String city;
     private String streetAddress;
     private String zipCode;
-
 }

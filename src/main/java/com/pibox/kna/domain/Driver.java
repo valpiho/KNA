@@ -21,4 +21,10 @@ public class Driver {
 
     @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
     private Set<Order> orders;
+
+    public Driver() { }
+
+    public Driver(String plateNumber) {
+        this.plateNumber = plateNumber;
+    }
 }
