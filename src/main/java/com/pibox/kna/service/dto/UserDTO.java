@@ -11,6 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserDTO {
+
     private String firstName;
     private String lastName;
     private String username;

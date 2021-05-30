@@ -3,9 +3,7 @@ package com.pibox.kna.domain;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -40,6 +38,14 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "users_users",
+            joinColumns = @JoinColumn(name = "contact_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> contacts = new ArrayList<>();
 
     public void addRole(Role role) {
         this.roles.add(role);

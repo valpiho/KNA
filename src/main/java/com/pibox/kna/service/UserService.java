@@ -26,6 +26,7 @@ import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.pibox.kna.constants.UserConstant.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -125,9 +126,12 @@ public class UserService implements UserDetailsService {
         mailService.sendNewPasswordEmail(user.getFirstName(), password, user.getEmail());
     }
 
-    public UserDTO getUserByUsername(String username) {
-        User user = findUserByUsername(username);
-        return modelMapper.map(user, UserDTO.class);
+    public void addContact(String authUsername, String username) {
+        findUserByUsername(authUsername).getContacts().add(findUserByUsername(username));
+    }
+
+    public void removeContact(String authUsername, String username) {
+        findUserByUsername(authUsername).getContacts().remove(findUserByUsername(username));
     }
 
     public User findUserByUsername(String username) {
@@ -136,6 +140,10 @@ public class UserService implements UserDetailsService {
 
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
+    }
+
+    public List<User> findAllUsers(String username) {
+        return userRepository.findAllByUsernameNot(username);
     }
 
     private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
