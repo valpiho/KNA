@@ -6,6 +6,7 @@ import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.EmailExistException;
+import com.pibox.kna.exceptions.domain.EmailNotFoundException;
 import com.pibox.kna.exceptions.domain.UserNotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.repository.RoleRepository;
@@ -63,7 +64,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-
     public void register(UserRegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, regForm.getUsername(), regForm.getPrivateEmail());
         User user = new User();
@@ -91,6 +91,38 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
         mailService.sendNewPasswordEmail(regForm.getFirstName(), password, regForm.getPrivateEmail());
         System.out.println(password);
+    }
+
+    public User updateUser(String username, UserDTO userDTO)
+            throws UserNotFoundException, EmailExistException, UsernameExistException {
+        User user = validateNewUsernameAndEmail(username, userDTO.getUsername(), userDTO.getEmail());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        if (userDTO.getDriverPlateNumber() != null) {
+            user.getDriver().setPlateNumber(userDTO.getDriverPlateNumber());
+        } else {
+            user.getClient().setEmail(userDTO.getClientEmail());
+            user.getClient().setPhoneNumber(userDTO.getClientPhoneNumber());
+            user.getClient().setCountry(userDTO.getClientCountry());
+            user.getClient().setCity(userDTO.getClientCity());
+            user.getClient().setStreetAddress(userDTO.getClientStreetAddress());
+            user.getClient().setZipCode(userDTO.getClientZipCode());
+        }
+        userRepository.save(user);
+        return user;
+    }
+
+    public void resetPassword(String email) throws EmailNotFoundException, MessagingException {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL + email);
+        }
+        String password = generatePassword();
+        user.setPassword(encodePassword(password));
+        userRepository.save(user);
+        mailService.sendNewPasswordEmail(user.getFirstName(), password, user.getEmail());
     }
 
     public UserDTO getUserByUsername(String username) {
