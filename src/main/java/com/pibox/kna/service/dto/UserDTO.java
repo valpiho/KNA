@@ -25,5 +25,6 @@ public class UserDTO {
     private String clientZipCode;
     private boolean isActive;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date joinDate;
-    private List<String> roles;
+    private String role;
+    private String[] authorities;
 }

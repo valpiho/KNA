@@ -22,6 +22,8 @@ public class User {
     private String imageUrl;
     private boolean isActive;
     private Date joinDate;
+    private String role;
+    private String[] authorities;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
@@ -31,14 +33,6 @@ public class User {
     @JoinColumn(name = "driver_id", referencedColumnName = "id")
     private Driver driver;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
-
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_users",
@@ -46,8 +40,4 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> contacts = new ArrayList<>();
-
-    public void addRole(Role role) {
-        this.roles.add(role);
-    }
 }

@@ -6,7 +6,6 @@ import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.*;
-import com.pibox.kna.repository.RoleRepository;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.utility.MailService;
@@ -28,6 +27,7 @@ import java.util.List;
 
 import static com.pibox.kna.constants.FileConstant.*;
 import static com.pibox.kna.constants.UserConstant.*;
+import static com.pibox.kna.domain.Enumeration.Role.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @Service
@@ -36,16 +36,13 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final MailService mailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
                        MailService mailService,
                        BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.mailService = mailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -74,7 +71,8 @@ public class UserService implements UserDetailsService {
         user.setActive(true);
         user.setJoinDate(new Date());
         if (regForm.isClientOrDriver()) {
-            user.addRole(roleRepository.findRoleByName("client"));
+            user.setRole(ROLE_CLIENT.name());
+            user.setAuthorities(ROLE_CLIENT.getAuthorities());
             user.setClient(new Client(
                     regForm.getCompanyEmail(),
                     regForm.getPhoneNumber(),
@@ -83,7 +81,8 @@ public class UserService implements UserDetailsService {
                     regForm.getStreetAddress(),
                     regForm.getZipCode()));
         } else {
-            user.addRole(roleRepository.findRoleByName("driver"));
+            user.setRole(ROLE_DRIVER.name());
+            user.setAuthorities(ROLE_DRIVER.getAuthorities());
             user.setDriver(new Driver(regForm.getPlateNumber()));
         }
         userRepository.save(user);

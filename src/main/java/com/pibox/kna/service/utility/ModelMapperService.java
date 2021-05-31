@@ -1,6 +1,5 @@
 package com.pibox.kna.service.utility;
 
-import com.pibox.kna.domain.Role;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.dto.UserMiniDTO;
@@ -22,9 +21,9 @@ public class ModelMapperService {
     }
 
     public UserDTO convertToUserDto(User user) {
-        Converter<Set<Role>, List<String>> convertToNameList = ctx -> ctx.getSource().stream().map(Role::getName).collect(Collectors.toList());
-        modelMapper.typeMap(User.class, UserDTO.class)
-                .addMappings(mapper -> mapper.using(convertToNameList).map(User::getRoles, UserDTO::setRoles));
+ //       Converter<Set<Role>, List<String>> convertToNameList = ctx -> ctx.getSource().stream().map(Role::getName).collect(Collectors.toList());
+ //       modelMapper.typeMap(User.class, UserDTO.class)
+ //              .addMappings(mapper -> mapper.using(convertToNameList).map(User::getRoles, UserDTO::setRoles));
         return modelMapper.map(user, UserDTO.class);
     }
 
