@@ -1,15 +1,13 @@
 package com.pibox.kna.web.rest;
 
+import com.pibox.kna.domain.Enumeration.Role;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.utility.MapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserMiniDTO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,5 +34,18 @@ public class UserResource {
         String username = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<User> users = userService.findAllUsers(username);
         return new ResponseEntity<>(mapper.convertToListOfUserMiniDTO(users), OK);
+    }
+
+    @GetMapping("/account/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable(value = "username") String username) {
+        User user = userService.findUserByUsername(username);
+        return getResponseEntity(user);
+    }
+
+    private ResponseEntity<?> getResponseEntity(User user) {
+        if (user.getRole().equals(Role.ROLE_DRIVER.name())) {
+            return new ResponseEntity<>(mapper.toDriverDto(user), OK);
+        }
+        return new ResponseEntity<>(mapper.toClientDto(user), OK);
     }
 }

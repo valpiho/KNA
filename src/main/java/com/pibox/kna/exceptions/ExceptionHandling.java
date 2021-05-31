@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.NoResultException;
+import javax.validation.ConstraintViolationException;
 import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.*;
@@ -27,7 +28,15 @@ public class ExceptionHandling {
     private static final String METHOD_IS_NOT_ALLOWED = "This request method is not allowed on this endpoint. Please send a '%s' request";
     private static final String INTERNAL_SERVER_ERROR_MSG = "An error occurred while processing the request";
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<HttpResponse> badRequestException(BadRequestException exception) {
+        return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<HttpResponse> validationException(ConstraintViolationException exception) {
+        return createHttpResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<HttpResponse> accountDisabledException() {

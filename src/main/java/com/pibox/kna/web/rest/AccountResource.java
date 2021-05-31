@@ -15,9 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +37,7 @@ import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 @RestController
+@Validated
 @RequestMapping({"/api/v1", "/api/v1/account"})
 public class AccountResource {
 
@@ -52,21 +57,21 @@ public class AccountResource {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<HttpResponse> register(@RequestBody UserDTO userDTO)
+    public ResponseEntity<HttpResponse> register(@Valid @RequestBody UserDTO userDTO)
             throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         userService.register(userDTO);
         return response(CREATED, USER_REGISTERED);
     }
 
     @GetMapping("/reset-password/{email}")
-    public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email)
+    public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") @Email String email)
             throws MessagingException, EmailNotFoundException {
         userService.resetPassword(email);
         return response(OK, NEW_PASSWORD_EMAIL_SENT + email);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO userDto) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserDTO userDto) {
         authenticate(userDto.getUsername(), userDto.getPassword());
         User loginUser = userService.findUserByUsername(userDto.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
@@ -86,17 +91,11 @@ public class AccountResource {
 
     @PatchMapping("/account")
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
-                                              @RequestBody UserDTO userDTO)
+                                        @Valid @RequestBody UserDTO userDTO)
             throws UserNotFoundException, EmailExistException, UsernameExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         User updatedUser = userService.updateUser(authUsername, userDTO);
         return getResponseEntity(updatedUser);
-    }
-
-    @GetMapping("/account/{username}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable(value = "username") String username) {
-        User user = userService.findUserByUsername(username);
-        return getResponseEntity(user);
     }
 
     @GetMapping("/account/contacts")
@@ -108,7 +107,9 @@ public class AccountResource {
 
     @PatchMapping("/account/contacts/add")
     public ResponseEntity<HttpResponse> addContact(@RequestHeader("Authorization") String token,
-                                                   @RequestParam("username") String username)
+                                                   @RequestParam("username") @Size(
+                                                           min = 2, max = 20, message = "Must be between 2 and 20 characters")
+                                                           String username)
             throws UserNotFoundException, UserExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.addContact(authUsername, username);
@@ -117,7 +118,9 @@ public class AccountResource {
 
     @PatchMapping("/account/contacts/remove")
     public ResponseEntity<HttpResponse> removeContact(@RequestHeader("Authorization") String token,
-                                                      @RequestParam("username") String username)
+                                                      @RequestParam("username") @Size(
+                                                              min = 2, max = 20, message = "Must be between 2 and 20 characters")
+                                                              String username)
             throws UserNotFoundException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.removeContact(authUsername, username);
