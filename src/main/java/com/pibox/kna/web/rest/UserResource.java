@@ -5,7 +5,6 @@ import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.ModelMapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserMiniDTO;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,7 +24,6 @@ public class UserResource {
     private final JWTTokenProvider jwtTokenProvider;
 
     public UserResource(UserService userService,
-                        ModelMapper modelMapper,
                         ModelMapperService mapper,
                         JWTTokenProvider jwtTokenProvider) {
         this.userService = userService;
@@ -34,7 +32,6 @@ public class UserResource {
     }
 
     @GetMapping
-    // TODO: Refactor code
     public ResponseEntity<List<UserMiniDTO>> getAllUsers(@RequestHeader("Authorization") String token) {
         String username = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<User> users = userService.findAllUsers(username);

@@ -5,10 +5,7 @@ import com.pibox.kna.domain.Driver;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
-import com.pibox.kna.exceptions.domain.EmailExistException;
-import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
-import com.pibox.kna.exceptions.domain.UsernameExistException;
+import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.repository.RoleRepository;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
@@ -126,12 +123,28 @@ public class UserService implements UserDetailsService {
         mailService.sendNewPasswordEmail(user.getFirstName(), password, user.getEmail());
     }
 
-    public void addContact(String authUsername, String username) {
-        findUserByUsername(authUsername).getContacts().add(findUserByUsername(username));
+    public void addContact(String authUsername, String username) throws UserNotFoundException, UserExistException {
+        User user = findUserByUsername(authUsername);
+        User addUser = findUserByUsername(username);
+        if(addUser == null) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        if (user.getContacts().contains(addUser)) {
+            throw new UserExistException(USER_EXIST);
+        }
+        user.getContacts().add(addUser);
     }
 
-    public void removeContact(String authUsername, String username) {
-        findUserByUsername(authUsername).getContacts().remove(findUserByUsername(username));
+    public void removeContact(String authUsername, String username) throws UserNotFoundException {
+        User user = findUserByUsername(authUsername);
+        User removeUser = findUserByUsername(username);
+        if(removeUser == null) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        if (!user.getContacts().contains(removeUser)) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        user.getContacts().remove(removeUser);
     }
 
     public User findUserByUsername(String username) {

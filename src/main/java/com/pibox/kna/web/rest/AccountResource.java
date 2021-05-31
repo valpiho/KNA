@@ -4,16 +4,12 @@ import com.pibox.kna.domain.HttpResponse;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
-import com.pibox.kna.exceptions.domain.EmailExistException;
-import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
-import com.pibox.kna.exceptions.domain.UsernameExistException;
+import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.ModelMapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.dto.UserMiniDTO;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -102,18 +98,18 @@ public class AccountResource {
     }
 
     @PatchMapping("/account/contacts/add")
-    // TODO: Check if user is already in contacts list
     public ResponseEntity<HttpResponse> addContact(@RequestHeader("Authorization") String token,
-                                                   @RequestParam("username") String username) {
+                                                   @RequestParam("username") String username)
+            throws UserNotFoundException, UserExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.addContact(authUsername, username);
         return response(OK, "Contact successfully added");
     }
 
     @PatchMapping("/account/contacts/remove")
-    // TODO: Check if user is in contacts list
     public ResponseEntity<HttpResponse> removeContact(@RequestHeader("Authorization") String token,
-                                                      @RequestParam("username") String username) {
+                                                      @RequestParam("username") String username)
+            throws UserNotFoundException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.removeContact(authUsername, username);
         return response(OK, "Contact successfully removed");
