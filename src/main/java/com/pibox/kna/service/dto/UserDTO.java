@@ -1,12 +1,11 @@
 package com.pibox.kna.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pibox.kna.domain.Role;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,5 +25,5 @@ public class UserDTO {
     private String clientZipCode;
     private boolean isActive;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date joinDate;
-    private Set<Role> roles;
+    private List<String> roles;
 }

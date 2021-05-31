@@ -1,4 +1,4 @@
-package com.pibox.kna.service;
+package com.pibox.kna.service.utility;
 
 import com.sun.mail.smtp.SMTPTransport;
 import org.springframework.stereotype.Service;

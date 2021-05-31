@@ -2,7 +2,7 @@ package com.pibox.kna.web.rest;
 
 import com.pibox.kna.domain.User;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
-import com.pibox.kna.service.ModelMapperService;
+import com.pibox.kna.service.utility.ModelMapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserMiniDTO;
 import org.springframework.http.ResponseEntity;

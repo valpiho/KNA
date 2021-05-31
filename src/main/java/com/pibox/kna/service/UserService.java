@@ -9,6 +9,7 @@ import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.repository.RoleRepository;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
+import com.pibox.kna.service.utility.MailService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;

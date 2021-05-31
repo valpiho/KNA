@@ -6,7 +6,7 @@ import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
-import com.pibox.kna.service.ModelMapperService;
+import com.pibox.kna.service.utility.ModelMapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.dto.UserMiniDTO;
