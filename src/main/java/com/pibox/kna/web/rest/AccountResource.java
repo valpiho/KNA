@@ -19,12 +19,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import static com.pibox.kna.constants.EmailConstant.NEW_PASSWORD_EMAIL_SENT;
+import static com.pibox.kna.constants.FileConstant.*;
 import static com.pibox.kna.constants.SecurityConstant.JWT_TOKEN_HEADER;
 import static com.pibox.kna.constants.UserConstant.USER_REGISTERED;
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 @RestController
 @RequestMapping({"/api/v1", "/api/v1/account"})
@@ -113,6 +119,20 @@ public class AccountResource {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.removeContact(authUsername, username);
         return response(OK, "Contact successfully removed");
+    }
+
+    @GetMapping(path = "/image/{username}", produces = IMAGE_JPEG_VALUE)
+    public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException {
+        URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL + username);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (InputStream inputStream = url.openStream()) {
+            int bytesRead;
+            byte[] chunk = new byte[1024];
+            while((bytesRead = inputStream.read(chunk)) > 0) {
+                byteArrayOutputStream.write(chunk, 0, bytesRead);
+            }
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

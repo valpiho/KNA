@@ -13,6 +13,7 @@ public class SecurityConstant {
             "/api/v1/login",
             "/api/v1/register",
             "/api/v1/reset-password/**",
+            "/api/v1/image/**",
             "/h2/console/**"
     };
 }
