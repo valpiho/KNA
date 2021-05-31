@@ -1,22 +1,23 @@
 package com.pibox.kna.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pibox.kna.domain.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Set;
 
 @Getter
 @Setter
 public class UserDTO {
 
-    private String username;
     private String firstName;
     private String lastName;
+    private String username;
+    private String password;
     private String email;
-    private String imageUrl;
+    @JsonProperty
+    private boolean isClientOrDriver;
     private String driverPlateNumber;
     private String clientEmail;
     private String clientPhoneNumber;
@@ -26,5 +27,6 @@ public class UserDTO {
     private String clientZipCode;
     private boolean isActive;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date joinDate;
-    private Set<Role> roles;
+    private String role;
+    private String[] authorities;
 }

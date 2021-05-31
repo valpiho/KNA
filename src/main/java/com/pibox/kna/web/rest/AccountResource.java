@@ -1,12 +1,12 @@
 package com.pibox.kna.web.rest;
 
+import com.pibox.kna.domain.Enumeration.Role;
 import com.pibox.kna.domain.HttpResponse;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
-import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
-import com.pibox.kna.service.ModelMapperService;
+import com.pibox.kna.service.utility.MapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.dto.UserMiniDTO;
@@ -38,12 +38,12 @@ public class AccountResource {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-    private final ModelMapperService mapper;
+    private final MapperService mapper;
     private final JWTTokenProvider jwtTokenProvider;
 
     public AccountResource(AuthenticationManager authenticationManager,
                            UserService userService,
-                           ModelMapperService mapper,
+                           MapperService mapper,
                            JWTTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
@@ -52,9 +52,9 @@ public class AccountResource {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<HttpResponse> register(@RequestBody UserRegistrationForm regForm)
+    public ResponseEntity<HttpResponse> register(@RequestBody UserDTO userDTO)
             throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
-        userService.register(regForm);
+        userService.register(userDTO);
         return response(CREATED, USER_REGISTERED);
     }
 
@@ -66,34 +66,37 @@ public class AccountResource {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
-        authenticate(user.getUsername(), user.getPassword());
-        User loginUser = userService.findUserByUsername(user.getUsername());
+    public ResponseEntity<?> login(@RequestBody UserDTO userDto) {
+        authenticate(userDto.getUsername(), userDto.getPassword());
+        User loginUser = userService.findUserByUsername(userDto.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
-        return new ResponseEntity<>(mapper.convertToUserDto(loginUser), jwtHeader, OK);
+        if (loginUser.getRole().equals(Role.ROLE_DRIVER.name())) {
+            return new ResponseEntity<>(mapper.toDriverDto(loginUser), jwtHeader, OK);
+        }
+        return new ResponseEntity<>(mapper.toClientDto(loginUser), jwtHeader, OK);
     }
 
     @GetMapping("/account")
-    public ResponseEntity<UserDTO> getUser(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         User user = userService.findUserByUsername(authUsername);
-        return new ResponseEntity<>(mapper.convertToUserDto(user), OK);
+        return getResponseEntity(user);
     }
 
     @PatchMapping("/account")
-    public ResponseEntity<UserDTO> updateUser(@RequestHeader("Authorization") String token,
+    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
                                               @RequestBody UserDTO userDTO)
             throws UserNotFoundException, EmailExistException, UsernameExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         User updatedUser = userService.updateUser(authUsername, userDTO);
-        return new ResponseEntity<>(mapper.convertToUserDto(updatedUser), OK);
+        return getResponseEntity(updatedUser);
     }
 
     @GetMapping("/account/{username}")
-    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable(value = "username") String username) {
+    public ResponseEntity<?> getUserByUsername(@PathVariable(value = "username") String username) {
         User user = userService.findUserByUsername(username);
-        return new ResponseEntity<>(mapper.convertToUserDto(user), OK);
+        return getResponseEntity(user);
     }
 
     @GetMapping("/account/contacts")
@@ -133,6 +136,13 @@ public class AccountResource {
             }
         }
         return byteArrayOutputStream.toByteArray();
+    }
+
+    private ResponseEntity<?> getResponseEntity(User user) {
+        if (user.getRole().equals(Role.ROLE_DRIVER.name())) {
+            return new ResponseEntity<>(mapper.toDriverDto(user), OK);
+        }
+        return new ResponseEntity<>(mapper.toClientDto(user), OK);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

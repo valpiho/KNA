@@ -1,4 +1,7 @@
 package com.pibox.kna.service;
 
-public interface DriverService {
+import org.springframework.stereotype.Service;
+
+@Service
+public class DriverService {
 }

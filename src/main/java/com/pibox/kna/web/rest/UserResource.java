@@ -2,7 +2,7 @@ package com.pibox.kna.web.rest;
 
 import com.pibox.kna.domain.User;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
-import com.pibox.kna.service.ModelMapperService;
+import com.pibox.kna.service.utility.MapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserMiniDTO;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +20,11 @@ import static org.springframework.http.HttpStatus.*;
 public class UserResource {
 
     private final UserService userService;
-    private final ModelMapperService mapper;
+    private final MapperService mapper;
     private final JWTTokenProvider jwtTokenProvider;
 
     public UserResource(UserService userService,
-                        ModelMapperService mapper,
+                        MapperService mapper,
                         JWTTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.mapper = mapper;
