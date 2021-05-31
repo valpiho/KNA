@@ -4,16 +4,12 @@ import com.pibox.kna.domain.HttpResponse;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
-import com.pibox.kna.exceptions.domain.EmailExistException;
-import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
-import com.pibox.kna.exceptions.domain.UsernameExistException;
+import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
+import com.pibox.kna.service.ModelMapperService;
 import com.pibox.kna.service.UserService;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.dto.UserMiniDTO;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +19,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.pibox.kna.constants.EmailConstant.NEW_PASSWORD_EMAIL_SENT;
+import static com.pibox.kna.constants.FileConstant.*;
 import static com.pibox.kna.constants.SecurityConstant.JWT_TOKEN_HEADER;
 import static com.pibox.kna.constants.UserConstant.USER_REGISTERED;
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 @RestController
 @RequestMapping({"/api/v1", "/api/v1/account"})
@@ -37,16 +38,16 @@ public class AccountResource {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-    private final ModelMapper modelMapper;
+    private final ModelMapperService mapper;
     private final JWTTokenProvider jwtTokenProvider;
 
     public AccountResource(AuthenticationManager authenticationManager,
                            UserService userService,
-                           ModelMapper modelMapper,
+                           ModelMapperService mapper,
                            JWTTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
-        this.modelMapper = modelMapper;
+        this.mapper = mapper;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -70,14 +71,14 @@ public class AccountResource {
         User loginUser = userService.findUserByUsername(user.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
-        return new ResponseEntity<>(modelMapper.map(loginUser, UserDTO.class), jwtHeader, OK);
+        return new ResponseEntity<>(mapper.convertToUserDto(loginUser), jwtHeader, OK);
     }
 
     @GetMapping("/account")
     public ResponseEntity<UserDTO> getUser(@RequestHeader("Authorization") String token) {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         User user = userService.findUserByUsername(authUsername);
-        return new ResponseEntity<>(modelMapper.map(user, UserDTO.class), OK);
+        return new ResponseEntity<>(mapper.convertToUserDto(user), OK);
     }
 
     @PatchMapping("/account")
@@ -86,47 +87,52 @@ public class AccountResource {
             throws UserNotFoundException, EmailExistException, UsernameExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         User updatedUser = userService.updateUser(authUsername, userDTO);
-        return new ResponseEntity<>(modelMapper.map(updatedUser, UserDTO.class), OK);
+        return new ResponseEntity<>(mapper.convertToUserDto(updatedUser), OK);
     }
 
     @GetMapping("/account/{username}")
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable(value = "username") String username) {
         User user = userService.findUserByUsername(username);
-        return new ResponseEntity<>(modelMapper.map(user, UserDTO.class), OK);
+        return new ResponseEntity<>(mapper.convertToUserDto(user), OK);
     }
 
     @GetMapping("/account/contacts")
-    // TODO: Refactor code
     public ResponseEntity<List<UserMiniDTO>> getUserContacts(@RequestHeader("Authorization") String token) {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<User> contacts = userService.findUserByUsername(authUsername).getContacts();
-
-        Converter<?, Boolean> check = ctx -> ctx.getSource() != null;
-        modelMapper.typeMap(User.class, UserMiniDTO.class)
-                .addMappings(mapper -> mapper.using(check).map(User::getDriver, UserMiniDTO::setDriver))
-                .addMappings(mapper -> mapper.using(check).map(User::getClient, UserMiniDTO::setClient));
-        List<UserMiniDTO> contactsDto = contacts.stream()
-                .map(user -> modelMapper.map(user, UserMiniDTO.class))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(contactsDto, OK);
+        return new ResponseEntity<>(mapper.convertToListOfUserMiniDTO(contacts), OK);
     }
 
     @PatchMapping("/account/contacts/add")
-    // TODO: Check if user is already in contacts list
     public ResponseEntity<HttpResponse> addContact(@RequestHeader("Authorization") String token,
-                                                   @RequestParam("username") String username) {
+                                                   @RequestParam("username") String username)
+            throws UserNotFoundException, UserExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.addContact(authUsername, username);
         return response(OK, "Contact successfully added");
     }
 
     @PatchMapping("/account/contacts/remove")
-    // TODO: Check if user is in contacts list
     public ResponseEntity<HttpResponse> removeContact(@RequestHeader("Authorization") String token,
-                                                      @RequestParam("username") String username) {
+                                                      @RequestParam("username") String username)
+            throws UserNotFoundException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         userService.removeContact(authUsername, username);
         return response(OK, "Contact successfully removed");
+    }
+
+    @GetMapping(path = "/image/{username}", produces = IMAGE_JPEG_VALUE)
+    public byte[] getTempProfileImage(@PathVariable("username") String username) throws IOException {
+        URL url = new URL(TEMP_PROFILE_IMAGE_BASE_URL + username);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (InputStream inputStream = url.openStream()) {
+            int bytesRead;
+            byte[] chunk = new byte[1024];
+            while((bytesRead = inputStream.read(chunk)) > 0) {
+                byteArrayOutputStream.write(chunk, 0, bytesRead);
+            }
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

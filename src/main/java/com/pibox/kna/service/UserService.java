@@ -5,22 +5,19 @@ import com.pibox.kna.domain.Driver;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.domain.form.UserRegistrationForm;
-import com.pibox.kna.exceptions.domain.EmailExistException;
-import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
-import com.pibox.kna.exceptions.domain.UsernameExistException;
+import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.repository.RoleRepository;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
@@ -28,6 +25,7 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
+import static com.pibox.kna.constants.FileConstant.*;
 import static com.pibox.kna.constants.UserConstant.*;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
@@ -39,18 +37,15 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MailService mailService;
-    private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        MailService mailService,
-                       ModelMapper modelMapper,
                        BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.mailService = mailService;
-        this.modelMapper = modelMapper;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -74,6 +69,7 @@ public class UserService implements UserDetailsService {
         user.setUsername(regForm.getUsername());
         user.setEmail(regForm.getPrivateEmail());
         user.setPassword(encodePassword(password));
+        user.setImageUrl(getTemporaryProfileImageUrl(regForm.getUsername()));
         user.setActive(true);
         user.setJoinDate(new Date());
         if (regForm.isClientOrDriver()) {
@@ -126,12 +122,28 @@ public class UserService implements UserDetailsService {
         mailService.sendNewPasswordEmail(user.getFirstName(), password, user.getEmail());
     }
 
-    public void addContact(String authUsername, String username) {
-        findUserByUsername(authUsername).getContacts().add(findUserByUsername(username));
+    public void addContact(String authUsername, String username) throws UserNotFoundException, UserExistException {
+        User user = findUserByUsername(authUsername);
+        User addUser = findUserByUsername(username);
+        if(addUser == null) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        if (user.getContacts().contains(addUser)) {
+            throw new UserExistException(USER_EXIST);
+        }
+        user.getContacts().add(addUser);
     }
 
-    public void removeContact(String authUsername, String username) {
-        findUserByUsername(authUsername).getContacts().remove(findUserByUsername(username));
+    public void removeContact(String authUsername, String username) throws UserNotFoundException {
+        User user = findUserByUsername(authUsername);
+        User removeUser = findUserByUsername(username);
+        if(removeUser == null) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        if (!user.getContacts().contains(removeUser)) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        user.getContacts().remove(removeUser);
     }
 
     public User findUserByUsername(String username) {
@@ -178,5 +190,9 @@ public class UserService implements UserDetailsService {
 
     private String encodePassword(String password) {
         return bCryptPasswordEncoder.encode(password);
+    }
+
+    private String getTemporaryProfileImageUrl(String username) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + username).toUriString();
     }
 }

@@ -2,10 +2,7 @@ package com.pibox.kna.exceptions;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.pibox.kna.domain.HttpResponse;
-import com.pibox.kna.exceptions.domain.EmailExistException;
-import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
-import com.pibox.kna.exceptions.domain.UsernameExistException;
+import com.pibox.kna.exceptions.domain.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +56,11 @@ public class ExceptionHandling {
 
     @ExceptionHandler(UsernameExistException.class)
     public ResponseEntity<HttpResponse> usernameExistException(UsernameExistException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(UserExistException.class)
+    public ResponseEntity<HttpResponse> userExistException(UserExistException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

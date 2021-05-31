@@ -12,9 +12,9 @@ import java.util.Set;
 @Setter
 public class UserDTO {
 
+    private String username;
     private String firstName;
     private String lastName;
-    private String username;
     private String email;
     private String imageUrl;
     private String driverPlateNumber;

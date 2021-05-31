@@ -7,4 +7,5 @@ public class UserConstant {
     public static final String NO_USER_FOUND_BY_EMAIL = "No user found for email: ";
 
     public static final String USER_REGISTERED = "User has been registered successfully";
+    public static final String USER_EXIST = "User already exist";
 }
