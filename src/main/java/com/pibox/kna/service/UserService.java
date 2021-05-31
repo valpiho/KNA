@@ -4,7 +4,6 @@ import com.pibox.kna.domain.Client;
 import com.pibox.kna.domain.Driver;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
-import com.pibox.kna.domain.form.UserRegistrationForm;
 import com.pibox.kna.exceptions.domain.*;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
@@ -58,35 +57,35 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void register(UserRegistrationForm regForm) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
-        validateNewUsernameAndEmail(EMPTY, regForm.getUsername(), regForm.getPrivateEmail());
+    public void register(UserDTO userDTO) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+        validateNewUsernameAndEmail(EMPTY, userDTO.getUsername(), userDTO.getEmail());
         User user = new User();
         String password = generatePassword();
-        user.setFirstName(regForm.getFirstName());
-        user.setLastName(regForm.getLastName());
-        user.setUsername(regForm.getUsername());
-        user.setEmail(regForm.getPrivateEmail());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
         user.setPassword(encodePassword(password));
-        user.setImageUrl(getTemporaryProfileImageUrl(regForm.getUsername()));
+        user.setImageUrl(getTemporaryProfileImageUrl(userDTO.getUsername()));
         user.setActive(true);
         user.setJoinDate(new Date());
-        if (regForm.isClientOrDriver()) {
+        if (userDTO.isClientOrDriver()) {
             user.setRole(ROLE_CLIENT.name());
             user.setAuthorities(ROLE_CLIENT.getAuthorities());
             user.setClient(new Client(
-                    regForm.getCompanyEmail(),
-                    regForm.getPhoneNumber(),
-                    regForm.getCountry(),
-                    regForm.getCity(),
-                    regForm.getStreetAddress(),
-                    regForm.getZipCode()));
+                    userDTO.getClientEmail(),
+                    userDTO.getClientPhoneNumber(),
+                    userDTO.getClientCountry(),
+                    userDTO.getClientCity(),
+                    userDTO.getClientStreetAddress(),
+                    userDTO.getClientZipCode()));
         } else {
             user.setRole(ROLE_DRIVER.name());
             user.setAuthorities(ROLE_DRIVER.getAuthorities());
-            user.setDriver(new Driver(regForm.getPlateNumber()));
+            user.setDriver(new Driver(userDTO.getDriverPlateNumber()));
         }
         userRepository.save(user);
-        mailService.sendNewPasswordEmail(regForm.getFirstName(), password, regForm.getPrivateEmail());
+        mailService.sendNewPasswordEmail(userDTO.getFirstName(), password, userDTO.getEmail());
         System.out.println(password);
     }
 
