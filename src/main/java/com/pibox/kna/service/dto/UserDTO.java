@@ -2,6 +2,7 @@ package com.pibox.kna.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,4 +50,22 @@ public class UserDTO {
 
     private String role;
     private String[] authorities;
+
+
+    @Builder
+    public UserDTO(String firstName, String lastName, String username, String email, boolean isClientOrDriver, String driverPlateNumber,
+                   String clientEmail, String clientPhoneNumber, String clientCountry, String clientCity, String clientStreetAddress, String clientZipCode) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.isClientOrDriver = isClientOrDriver;
+        this.driverPlateNumber = driverPlateNumber;
+        this.clientEmail = clientEmail;
+        this.clientPhoneNumber = clientPhoneNumber;
+        this.clientCountry = clientCountry;
+        this.clientCity = clientCity;
+        this.clientStreetAddress = clientStreetAddress;
+        this.clientZipCode = clientZipCode;
+    }
 }
