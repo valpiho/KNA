@@ -3,6 +3,7 @@ package com.pibox.kna.service;
 import com.pibox.kna.domain.Enumeration.Role;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.exceptions.domain.EmailExistException;
+import com.pibox.kna.exceptions.domain.EmailNotFoundException;
 import com.pibox.kna.exceptions.domain.UserNotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.repository.UserRepository;
@@ -10,14 +11,14 @@ import com.pibox.kna.service.dto.UserDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.mail.MessagingException;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserServiceTest {
@@ -52,6 +53,16 @@ class UserServiceTest {
             .build();
 
     @Test
+    void LoadByUsername() {
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("john"));
+    }
+
+    @Test
+    void throwsUsernameNotFoundExceptionOnLoadByUsername() {
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("john"));
+    }
+
+    @Test
     void registerNewUserAsDriver() throws UserNotFoundException, EmailExistException, MessagingException, UsernameExistException {
         userService.register(userDtoAsDriver);
         User user = userRepository.findUserByUsername(userDtoAsDriver.getUsername());
@@ -73,6 +84,32 @@ class UserServiceTest {
         assertThat(user.getRole()).isEqualTo(Role.ROLE_CLIENT.toString());
         assertThat(user.isActive()).isTrue();
         assertThat(user.getDriver()).isNull();
+    }
+
+    @Test
+    void throwsEmailExistsExceptionOnRegisterNewUser() {
+        UserDTO user= UserDTO.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@gmail.com")
+                .username("john")
+                .isClientOrDriver(false)
+                .driverPlateNumber("323 BDX")
+                .build();
+        assertThrows(EmailExistException.class, () -> userService.register(user));
+    }
+
+    @Test
+    void throwsUsernameExistsExceptionOnRegisterNewUser() {
+        UserDTO user= UserDTO.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@gmail.com")
+                .username("johnDo")
+                .isClientOrDriver(false)
+                .driverPlateNumber("323 BDX")
+                .build();
+        assertThrows(UsernameExistException.class, () -> userService.register(user));
     }
 
     @Test
@@ -121,11 +158,50 @@ class UserServiceTest {
     }
 
     @Test
-    void resetPassword() {
+    void throwsEmailExistsExceptionOnUpdateUser() {
+        UserDTO user= UserDTO.builder()
+                .email("val.piho@gmail.com")
+                .username("john")
+                .build();
+        assertThrows(EmailExistException.class, () -> userService.updateUser("johnDoe", user));
+    }
+
+    @Test
+    void throwsUsernameExistsExceptionOnUpdateUser() {
+        UserDTO user= UserDTO.builder()
+                .email("john@gmail.com")
+                .username("valP")
+                .build();
+        assertThrows(UsernameExistException.class, () -> userService.updateUser("johnDo", user));
+    }
+
+    @Test
+    void throwsUsernameNotFoundExceptionOnUpdateUser() {
+        UserDTO user= UserDTO.builder()
+                .email("john@gmail.com")
+                .username("valP")
+                .build();
+        assertThrows(UserNotFoundException.class, () -> userService.updateUser("johny", user));
+    }
+
+    @Test
+    void throwsEmailNotFoundExceptionOnResetPassword() {
+        assertThrows(EmailNotFoundException.class, () -> userService.resetPassword("email@email.com"));
+    }
+
+    @Test
+    void resetPassword() throws EmailNotFoundException, MessagingException {
+        userService.resetPassword("val.piho@gmail.com");
+
+        User user = userRepository.findUserByEmail("val.piho@gmail.com");
+
+        assertNotEquals(user.getPassword(), userDtoAsClient.getPassword());
     }
 
     @Test
     void deleteUser() {
+        userService.deleteUser("valP");
+        assertThat(userRepository.findUserByUsername("valP")).isNull();
     }
 
     @Test
@@ -137,10 +213,11 @@ class UserServiceTest {
     }
 
     @Test
-    void findAllUsers() {
+    void findAllUsers() throws UserNotFoundException, EmailExistException, MessagingException, UsernameExistException {
+        userService.register(userDtoAsClient);
         List<User> users = userService.findAllUsers("johnDo");
 
         assertFalse(users.isEmpty());
-        assertEquals("valP", users.get(0).getUsername());
+        assertEquals("valPiho", users.get(0).getUsername());
     }
 }
