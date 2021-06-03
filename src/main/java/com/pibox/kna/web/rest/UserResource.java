@@ -9,6 +9,7 @@ import com.pibox.kna.exceptions.domain.EmailNotFoundException;
 import com.pibox.kna.exceptions.domain.UserNotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
+import com.pibox.kna.service.dto.LoginDTO;
 import com.pibox.kna.service.dto.UserDTO;
 import com.pibox.kna.service.utility.MapperService;
 import com.pibox.kna.service.UserService;
@@ -72,9 +73,9 @@ public class UserResource {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserDTO userDto) {
-        authenticate(userDto.getUsername(), userDto.getPassword());
-        User loginUser = userService.findUserByUsername(userDto.getUsername());
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+        authenticate(loginDTO.getUsername(), loginDTO.getPassword());
+        User loginUser = userService.findUserByUsername(loginDTO.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
         if (loginUser.getRole().equals(Role.ROLE_DRIVER.name())) {
