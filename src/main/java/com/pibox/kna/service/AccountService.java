@@ -19,8 +19,8 @@ public class AccountService {
     }
 
     public void addContact(String authUsername, String username) throws UserNotFoundException, UserExistException {
-        User user = findUserByUsername(authUsername);
-        User addUser = findUserByUsername(username);
+        User user = userRepository.findUserByUsername(authUsername);
+        User addUser = userRepository.findUserByUsername(username);
         if(addUser == null) {
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         }
@@ -31,8 +31,8 @@ public class AccountService {
     }
 
     public void removeContact(String authUsername, String username) throws UserNotFoundException {
-        User user = findUserByUsername(authUsername);
-        User removeUser = findUserByUsername(username);
+        User user = userRepository.findUserByUsername(authUsername);
+        User removeUser = userRepository.findUserByUsername(username);
         if(removeUser == null) {
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         }
@@ -40,9 +40,5 @@ public class AccountService {
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         }
         user.getContacts().remove(removeUser);
-    }
-
-    public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
     }
 }

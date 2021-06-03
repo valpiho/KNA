@@ -52,7 +52,6 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         } else {
-            userRepository.save(user);
             return new UserPrincipal(user);
         }
     }
