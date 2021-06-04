@@ -242,14 +242,6 @@ class UserServiceTest {
     }
 
     @Test
-    void findUserByUsername() {
-    }
-
-    @Test
-    void findUserByEmail() {
-    }
-
-    @Test
     void findAllUsers() {
         List<User> users = userService.findAllUsers("johnDoe");
 
