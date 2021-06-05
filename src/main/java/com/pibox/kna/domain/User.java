@@ -1,6 +1,6 @@
 package com.pibox.kna.domain;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.*;

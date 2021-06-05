@@ -1,7 +1,7 @@
 package com.pibox.kna.web.rest;
 
 import com.pibox.kna.domain.Order;
-import com.pibox.kna.service.impl.OrderServiceImpl;
+import com.pibox.kna.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +12,20 @@ import java.util.List;
 public class OrderResource {
 
     @Autowired
-    private OrderServiceImpl orderServiceImpl;
+    private OrderService orderService;
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Order> getAllOrders(){
-        return orderServiceImpl.getAllOrders();
+        return orderService.getAllOrders();
     }
 
     @PostMapping("/add")
     public Order addNewOrder(@RequestBody Order order){
-        return orderServiceImpl.addNewOrder(order);
+        return orderService.addNewOrder(order);
+    }
+
+    @GetMapping("/{title}")
+    public Order getOrderByTitle(@PathVariable("title") String title){
+        return orderService.getOrderByTitle(title);
     }
 }

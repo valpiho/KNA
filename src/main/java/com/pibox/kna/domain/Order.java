@@ -1,15 +1,16 @@
 package com.pibox.kna.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pibox.kna.domain.Enumeration.Status;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 @Table(name = "kna_order")
@@ -22,9 +23,9 @@ public class Order {
     private String qrCode;
     private String title;
     private String description;
-    private Date createdAt;
-    private Date shippedAt;
-    private Date receivedAt;
+    @JsonFormat(pattern = "dd/MM/yyyy") private Date createdAt;
+    @JsonFormat(pattern = "dd/MM/yyyy") private Date shippedAt;
+    @JsonFormat(pattern = "dd/MM/yyyy") private Date receivedAt;
     private Status status;
     private Boolean isActive;
 
