@@ -11,4 +11,8 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Order findOrderByTitle(String title);
+
+    //List<Order> findOrderByUserName(String username);
+
+    Order findOrderByQrCode(String qrCode);
 }
