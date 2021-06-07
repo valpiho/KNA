@@ -15,5 +15,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT u FROM Order u WHERE u.createdBy.user.username = ?1")
     List<Order> findAllByUsername(String username);
 
-
+    @Query("SELECT u FROM Order u WHERE u.status = 0")
+    List<Order> getAllOpenOrders();
 }

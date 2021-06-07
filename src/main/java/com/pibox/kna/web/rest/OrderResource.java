@@ -58,6 +58,20 @@ public class OrderResource {
         return new ResponseEntity<>(mapper.toListOfOrderResMiniDTO(orders), OK);
     }
 
+    @GetMapping("/open")
+    @PreAuthorize("hasAnyAuthority('driver:read')")
+    public ResponseEntity<List<OrderResMiniDTO>> getOnlyOpenedOrders(){
+        List<Order> orders = orderService.getAllOpenedOrders();
+        return new ResponseEntity<>(mapper.toListOfOrderResMiniDTO(orders), OK);
+    }
+
+    @GetMapping("/{username}")
+    @PreAuthorize("hasAnyAuthority('admin:read')")
+    public ResponseEntity<List<OrderResMiniDTO>> getOrdersByUsername(@PathVariable("username") String username){
+        List<Order> orders = orderService.getClientOrders(username);
+        return new ResponseEntity<>(mapper.toListOfOrderResMiniDTO(orders), OK);
+    }
+
     @GetMapping("/{qrCode}")
     public ResponseEntity<OrderResDTO> getOrderById(@PathVariable("qrCode") String qrCode)
             throws NotFoundException {
@@ -68,33 +82,12 @@ public class OrderResource {
     @DeleteMapping("/{qrCode}")
     @PreAuthorize("hasAnyAuthority('client:delete', 'admin:delete')")
     public ResponseEntity<HttpResponse> deleteOrderByQrCode(@PathVariable("qrCode") String qrCode,
-                                    @RequestHeader("Authorization") String token)
+                                                            @RequestHeader("Authorization") String token)
             throws NotFoundException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         orderService.deleteOrderByQrCode(authUsername, qrCode);
         return response(OK, ORDER_DELETED_SUCCESSFULLY);
     }
-
-//    //Method for Drivers. Drivers can see ONLY OPENED Orders.
-//    @GetMapping("/openedOrders")
-//    public List<Order> getOnlyOpenedOrders(){
-//        return orderService.getOnlyOpenedOrders();
-//    }
-//
-//    @GetMapping("/inProgressOrders")
-//    public List<Order> getOnlyInProgressOrders(){
-//        return orderService.getOnlyInProgressOrders();
-//    }
-//
-//    @GetMapping("/closedOrders")
-//    public List<Order> getOnlyClosedOrders(){
-//        return orderService.getOnlyClosedOrders();
-//    }
-//
-//    @GetMapping("/username/{username}")
-//    public List<Order> getOrdersByUsername(@PathVariable("username") String username){
-//        return orderService.getOrdersByUsername(username);
-//    }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, message), httpStatus);

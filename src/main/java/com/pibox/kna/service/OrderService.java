@@ -38,7 +38,7 @@ public class OrderService {
         newOrder.setQrCode(qrCode);
         newOrder.setTitle(orderDto.getTitle());
         newOrder.setDescription(orderDto.getDescription());
-        newOrder.setStatus(Status.OPENED);
+        newOrder.setStatus(Status.OPEN);
         newOrder.setIsActive(true);
         newOrder.setCreatedAt(new Date());
         newOrder.setCreatedBy(authUser.getClient());
@@ -69,6 +69,10 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    public List<Order> getAllOpenedOrders() {
+        return orderRepository.getAllOpenOrders();
+    }
+
     public void deleteOrderByQrCode(String authUsername, String qrCode) throws NotFoundException {
         Order order = orderRepository.findOrderByQrCode(qrCode);
         User user = userRepository.findUserByUsername(authUsername);
@@ -81,58 +85,6 @@ public class OrderService {
         orderRepository.deleteById(order.getId());
     }
 
-    //Method for drivers
-//    public List<Order> getOnlyOpenedOrders() {
-//        List<Order> allOrders = getAllOrders();
-//        List<Order> openedOrders = new ArrayList<>();
-//        int quantityOfOpenedOrders = 0;
-//        for (Order order : allOrders) {
-//            if (order.getStatus().equals(Status.OPENED)) {
-//                openedOrders.add(order);
-//                quantityOfOpenedOrders++;
-//            }
-//        }
-//        System.out.println(quantityOfOpenedOrders);
-//        return openedOrders;
-//    }
-
-//    public List<Order> getOnlyInProgressOrders() {
-//        List<Order> allOrders = getAllOrders();
-//        List<Order> inProgressOrders = new ArrayList<>();
-//        int quantityOfInProgressOrders = 0;
-//        for (Order order : allOrders) {
-//            if (order.getStatus().equals(Status.IN_PROGRESS)) {
-//                inProgressOrders.add(order);
-//                quantityOfInProgressOrders++;
-//            }
-//        }
-//        System.out.println(quantityOfInProgressOrders);
-//        return inProgressOrders;
-//    }
-
-
-//    public List<Order> getOnlyClosedOrders() {
-//        List<Order> allOrders = getAllOrders();
-//        List<Order> closedOrders = new ArrayList<>();
-//        int quantityOfClosedOrders = 0;
-//        for (Order order : allOrders) {
-//            if (order.getStatus().equals(Status.CLOSED)) {
-//                closedOrders.add(order);
-//                quantityOfClosedOrders++;
-//            }
-//        }
-//        System.out.println(quantityOfClosedOrders);
-//        return closedOrders;
-//    }
-
-//    public List<Order> getOrdersByUsername(String username) {
-//        List<Order> allOrders = getAllOrders();
-//        List<Order> orderListByUsername = new ArrayList<>();
-//        User user = userRepository.findUserByUsername(username);
-//        return orderListByUsername;
-//    }
-
-    //for method addNewOrder
     private String generateQRCode() {
         return RandomStringUtils.randomAlphanumeric(15);
     }
