@@ -1,10 +1,9 @@
 package com.pibox.kna.service;
 
-import com.pibox.kna.domain.Client;
+import com.pibox.kna.domain.Enumeration.OrderType;
 import com.pibox.kna.domain.Enumeration.Status;
 import com.pibox.kna.domain.Order;
 import com.pibox.kna.domain.User;
-import com.pibox.kna.repository.ClientRepository;
 import com.pibox.kna.repository.OrderRepository;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.OrderDTO;
@@ -20,14 +19,11 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final ClientRepository clientRepository;
 
     public OrderService(OrderRepository orderRepository,
-                        UserRepository userRepository,
-                        ClientRepository clientRepository) {
+                        UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
-        this.clientRepository = clientRepository;
     }
 
     public List<Order> getAllOrders() {
@@ -46,14 +42,15 @@ public class OrderService {
         newOrder.setIsActive(true);
         newOrder.setCreatedAt(new Date());
         if (orderDto.getIsInbound()) {
+            newOrder.setOrderType(OrderType.INBOUND);
             newOrder.setFromClient(user.getClient());
             newOrder.setToClient(authUser.getClient());
         } else {
+            newOrder.setOrderType(OrderType.OUTBOUND);
             newOrder.setFromClient(authUser.getClient());
             newOrder.setToClient(user.getClient());
         }
         orderRepository.save(newOrder);
-
         return newOrder;
     }
 

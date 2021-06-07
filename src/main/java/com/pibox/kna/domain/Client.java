@@ -42,4 +42,8 @@ public class Client {
         this.streetAddress = streetAddress;
         this.zipCode = zipCode;
     }
+
+    public void addOrder(Order order) {
+        this.orders.add(order);
+    }
 }

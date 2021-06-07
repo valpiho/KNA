@@ -35,7 +35,7 @@ public class MapperService {
                 .collect(Collectors.toList());
     }
 
-    public OrderResDTO toOrderResDto(Order order) {
-        return modelMapper.map(order, OrderResDTO.class);
+    public OrderResDTO toOrderResDto(Order entity) {
+        return modelMapper.map(entity, OrderResDTO.class);
     }
 }
