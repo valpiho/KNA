@@ -10,8 +10,6 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Order findOrderByTitle(String title);
-
     Order findOrderByQrCode(String qrCode);
 
     @Query("SELECT u FROM Order u WHERE u.createdBy.user.username = ?1")

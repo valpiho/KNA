@@ -56,7 +56,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void register(UserDTO userDTO) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+    public void register(UserDTO userDTO) throws NotFoundException, EmailExistException, UsernameExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, userDTO.getUsername(), userDTO.getEmail());
         User user = new User();
         String password = generatePassword();
@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUser(String username, UserDTO userDTO)
-            throws UserNotFoundException, EmailExistException, UsernameExistException {
+            throws NotFoundException, EmailExistException, UsernameExistException {
         User user = validateNewUsernameAndEmail(username, userDTO.getUsername(), userDTO.getEmail());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
@@ -137,13 +137,13 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllByUsernameNot(username);
     }
 
-    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
+    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws NotFoundException, UsernameExistException, EmailExistException {
         User userByNewUsername = findUserByUsername(newUsername);
         User userByNewEmail = findUserByEmail(newEmail);
         if(StringUtils.isNotBlank(currentUsername)) {
             User currentUser = findUserByUsername(currentUsername);
             if(currentUser == null) {
-                throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
+                throw new NotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
             }
             if(userByNewUsername != null && !currentUser.getId().equals(userByNewUsername.getId())) {
                 throw new UsernameExistException(USERNAME_ALREADY_EXISTS);

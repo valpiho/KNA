@@ -3,7 +3,7 @@ package com.pibox.kna.service;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.exceptions.domain.EmailExistException;
 import com.pibox.kna.exceptions.domain.UserExistException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
+import com.pibox.kna.exceptions.domain.NotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
@@ -55,13 +55,13 @@ class AccountServiceTest {
             .build();
 
     @BeforeEach
-    void setUp() throws UserNotFoundException, EmailExistException, MessagingException, UsernameExistException {
+    void setUp() throws NotFoundException, EmailExistException, MessagingException, UsernameExistException {
         userService.register(userDtoAsDriver);
         userService.register(userDtoAsClient);
     }
 
     @Test
-    void addContact() throws UserNotFoundException, UserExistException {
+    void addContact() throws NotFoundException, UserExistException {
         accountService.addContact(userDtoAsClient.getUsername(), userDtoAsDriver.getUsername());
         User user = userRepository.findUserByUsername(userDtoAsClient.getUsername());
 
@@ -71,17 +71,17 @@ class AccountServiceTest {
 
     @Test
     void throwsUsernameNotFoundExceptionOnAddContact() {
-        assertThrows(UserNotFoundException.class, () -> accountService.addContact(userDtoAsClient.getUsername(), "john"));
+        assertThrows(NotFoundException.class, () -> accountService.addContact(userDtoAsClient.getUsername(), "john"));
     }
 
     @Test
-    void throwsUserExistExceptionOnAddContact() throws UserNotFoundException, UserExistException {
+    void throwsUserExistExceptionOnAddContact() throws NotFoundException, UserExistException {
         accountService.addContact(userDtoAsClient.getUsername(), userDtoAsDriver.getUsername());
         assertThrows(UserExistException.class, () -> accountService.addContact(userDtoAsClient.getUsername(), "johnDoe"));
     }
 
     @Test
-    void removeContact() throws UserNotFoundException, UserExistException {
+    void removeContact() throws NotFoundException, UserExistException {
         accountService.addContact(userDtoAsClient.getUsername(), userDtoAsDriver.getUsername());
 
         accountService.removeContact(userDtoAsClient.getUsername(), userDtoAsDriver.getUsername());
@@ -92,11 +92,11 @@ class AccountServiceTest {
 
     @Test
     void throwsUsernameNotFoundExceptionOnRemoveContact() {
-        assertThrows(UserNotFoundException.class, () -> accountService.removeContact(userDtoAsClient.getUsername(), "john"));
+        assertThrows(NotFoundException.class, () -> accountService.removeContact(userDtoAsClient.getUsername(), "john"));
     }
 
     @Test
     void throwsUsernameNotFoundExceptionNoContainsOnRemoveContact() {
-        assertThrows(UserNotFoundException.class, () -> accountService.removeContact(userDtoAsClient.getUsername(), "johnDoe"));
+        assertThrows(NotFoundException.class, () -> accountService.removeContact(userDtoAsClient.getUsername(), "johnDoe"));
     }
 }

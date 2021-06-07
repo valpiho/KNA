@@ -1,16 +1,22 @@
 package com.pibox.kna.service;
 
+import com.pibox.kna.domain.Enumeration.Role;
 import com.pibox.kna.domain.Enumeration.Status;
 import com.pibox.kna.domain.Order;
 import com.pibox.kna.domain.User;
+import com.pibox.kna.exceptions.domain.NotFoundException;
 import com.pibox.kna.repository.OrderRepository;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.OrderDTO;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.pibox.kna.constants.OrderConstant.NO_ORDER_FOUND_BY_QRCODE;
+import static com.pibox.kna.constants.SecurityConstant.ACCESS_DENIED_MESSAGE;
 
 @Service
 public class OrderService {
@@ -47,16 +53,27 @@ public class OrderService {
         return newOrder;
     }
 
-    public Order getOrderByQrCode(String qrCode){
-        return orderRepository.findOrderByQrCode(qrCode);
+    public Order getOrderByQrCode(String qrCode) throws NotFoundException {
+        Order order = orderRepository.findOrderByQrCode(qrCode);
+        if (order == null) {
+            throw new NotFoundException(NO_ORDER_FOUND_BY_QRCODE + qrCode);
+        }
+        return order;
     }
 
     public List<Order> getClientOrders(String authUsername) {
         return orderRepository.findAllByUsername(authUsername);
     }
 
-    public void deleteOrderByQrCode(String qrCode){
+    public void deleteOrderByQrCode(String authUsername, String qrCode) throws NotFoundException {
         Order order = orderRepository.findOrderByQrCode(qrCode);
+        User user = userRepository.findUserByUsername(authUsername);
+        if (order == null) {
+            throw new NotFoundException(NO_ORDER_FOUND_BY_QRCODE + qrCode);
+        }
+        if (!order.getCreatedBy().getUser().equals(user) || !user.getRole().equals(Role.ROLE_ADMIN.name())) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+        }
         orderRepository.deleteById(order.getId());
     }
 

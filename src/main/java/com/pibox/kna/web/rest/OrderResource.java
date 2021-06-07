@@ -1,6 +1,7 @@
 package com.pibox.kna.web.rest;
 
 import com.pibox.kna.domain.Order;
+import com.pibox.kna.exceptions.domain.NotFoundException;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.OrderService;
 import com.pibox.kna.service.dto.OrderDTO;
@@ -48,14 +49,19 @@ public class OrderResource {
     }
 
     @GetMapping("/{qrCode}")
-    public ResponseEntity<OrderResDTO> getOrderById(@PathVariable("qrCode") String qrCode){
+    public ResponseEntity<OrderResDTO> getOrderById(@PathVariable("qrCode") String qrCode)
+            throws NotFoundException {
         Order order = orderService.getOrderByQrCode(qrCode);
         return new ResponseEntity<>(mapper.toOrderResDto(order), OK);
     }
 
-    @DeleteMapping("/delete/{qrCode}")
-    public void deleteOrderByQrCode(@PathVariable("qrCode") String qrCode){
-        orderService.deleteOrderByQrCode(qrCode);
+    @DeleteMapping("/{qrCode}")
+    @PreAuthorize("hasAnyAuthority('client:delete', 'admin:delete')")
+    public void deleteOrderByQrCode(@PathVariable("qrCode") String qrCode,
+                                    @RequestHeader("Authorization") String token)
+            throws NotFoundException {
+        String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
+        orderService.deleteOrderByQrCode(authUsername, qrCode);
     }
 
 //    //Method for Drivers. Drivers can see ONLY OPENED Orders.

@@ -4,7 +4,7 @@ import com.pibox.kna.domain.Enumeration.Role;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.exceptions.domain.EmailExistException;
 import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
+import com.pibox.kna.exceptions.domain.NotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.repository.UserRepository;
 import com.pibox.kna.service.dto.UserDTO;
@@ -57,7 +57,7 @@ class UserServiceTest {
             .build();
 
     @BeforeEach
-    void setUp() throws UserNotFoundException, EmailExistException, MessagingException, UsernameExistException {
+    void setUp() throws NotFoundException, EmailExistException, MessagingException, UsernameExistException {
         userService.register(userDtoAsDriver);
         userService.register(userDtoAsClient);
     }
@@ -79,7 +79,7 @@ class UserServiceTest {
     }
 
     @Test
-    void registerNewUserAsDriver() throws UserNotFoundException, EmailExistException, MessagingException, UsernameExistException {
+    void registerNewUserAsDriver() throws NotFoundException, EmailExistException, MessagingException, UsernameExistException {
         UserDTO userDto = UserDTO.builder()
                 .firstName("Johny")
                 .lastName("Doe")
@@ -99,7 +99,7 @@ class UserServiceTest {
     }
 
     @Test
-    void registerNewUserAsClient() throws UserNotFoundException, EmailExistException, MessagingException, UsernameExistException {
+    void registerNewUserAsClient() throws NotFoundException, EmailExistException, MessagingException, UsernameExistException {
         UserDTO userDto = UserDTO.builder()
                 .firstName("Vally")
                 .lastName("Piho")
@@ -150,7 +150,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUserAsDriver() throws UserNotFoundException, EmailExistException, UsernameExistException {
+    void updateUserAsDriver() throws NotFoundException, EmailExistException, UsernameExistException {
         UserDTO updatedUserDto = UserDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -170,7 +170,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUserAsClient() throws UserNotFoundException, EmailExistException, UsernameExistException {
+    void updateUserAsClient() throws NotFoundException, EmailExistException, UsernameExistException {
         UserDTO updatedUserDto = UserDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -218,7 +218,7 @@ class UserServiceTest {
                 .email("john@ail.com")
                 .username("valP")
                 .build();
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser("johny", user));
+        assertThrows(NotFoundException.class, () -> userService.updateUser("johny", user));
     }
 
     @Test

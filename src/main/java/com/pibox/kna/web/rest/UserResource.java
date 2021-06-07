@@ -6,7 +6,7 @@ import com.pibox.kna.domain.User;
 import com.pibox.kna.domain.UserPrincipal;
 import com.pibox.kna.exceptions.domain.EmailExistException;
 import com.pibox.kna.exceptions.domain.EmailNotFoundException;
-import com.pibox.kna.exceptions.domain.UserNotFoundException;
+import com.pibox.kna.exceptions.domain.NotFoundException;
 import com.pibox.kna.exceptions.domain.UsernameExistException;
 import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.dto.LoginDTO;
@@ -60,7 +60,7 @@ public class UserResource {
 
     @PostMapping("/register")
     public ResponseEntity<HttpResponse> register(@Valid @RequestBody UserDTO userDTO)
-            throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+            throws NotFoundException, EmailExistException, UsernameExistException, MessagingException {
         userService.register(userDTO);
         return response(CREATED, USER_REGISTERED);
     }
@@ -100,7 +100,7 @@ public class UserResource {
     @PostMapping("/users")
     @PreAuthorize("hasAnyAuthority('admin:create')")
     public ResponseEntity<HttpResponse> addNewUser(@Valid @RequestBody UserDTO userDTO)
-            throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+            throws NotFoundException, EmailExistException, UsernameExistException, MessagingException {
         userService.register(userDTO);
         return response(CREATED, USER_REGISTERED);
     }
@@ -109,7 +109,7 @@ public class UserResource {
     @PreAuthorize("hasAnyAuthority('admin:update')")
     public ResponseEntity<?> updateUser(@PathVariable(value = "username") String username,
                                         @Valid @RequestBody UserDTO userDTO)
-            throws UserNotFoundException, EmailExistException, UsernameExistException {
+            throws NotFoundException, EmailExistException, UsernameExistException {
         User updatedUser = userService.updateUser(username, userDTO);
         return getResponseEntity(updatedUser);
     }
