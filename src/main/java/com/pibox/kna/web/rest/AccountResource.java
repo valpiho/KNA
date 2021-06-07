@@ -62,7 +62,7 @@ public class AccountResource {
     public ResponseEntity<List<UserMiniDTO>> getUserContacts(@RequestHeader("Authorization") String token) {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<User> contacts = userService.findUserByUsername(authUsername).getContacts();
-        return new ResponseEntity<>(mapper.convertToListOfUserMiniDTO(contacts), OK);
+        return new ResponseEntity<>(mapper.toListOfUserMiniDTO(contacts), OK);
     }
 
     @PatchMapping("/contacts/add")

@@ -5,6 +5,7 @@ import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.OrderService;
 import com.pibox.kna.service.dto.OrderDTO;
 import com.pibox.kna.service.dto.OrderResDTO;
+import com.pibox.kna.service.dto.OrderResMiniDTO;
 import com.pibox.kna.service.utility.MapperService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,9 +31,11 @@ public class OrderResource {
         this.mapper = mapper;
     }
 
-    @GetMapping("/all")
-    public List<Order> getAllOrders(){
-        return orderService.getAllOrders();
+    @GetMapping
+    public ResponseEntity<List<OrderResMiniDTO>> getOrders(@RequestHeader("Authorization") String token){
+        String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
+        List<Order> orders = orderService.getClientOrders(authUsername);
+        return new ResponseEntity<>(mapper.toListOfOrderResMiniDTO(orders), OK);
     }
 
     @PostMapping
@@ -64,24 +67,24 @@ public class OrderResource {
         orderService.deleteOrderByQrCode(qrCode);
     }
 
-    //Method for Drivers. Drivers can see ONLY OPENED Orders.
-    @GetMapping("/openedOrders")
-    public List<Order> getOnlyOpenedOrders(){
-        return orderService.getOnlyOpenedOrders();
-    }
-
-    @GetMapping("/inProgressOrders")
-    public List<Order> getOnlyInProgressOrders(){
-        return orderService.getOnlyInProgressOrders();
-    }
-
-    @GetMapping("/closedOrders")
-    public List<Order> getOnlyClosedOrders(){
-        return orderService.getOnlyClosedOrders();
-    }
-
-    @GetMapping("/username/{username}")
-    public List<Order> getOrdersByUsername(@PathVariable("username") String username){
-        return orderService.getOrdersByUsername(username);
-    }
+//    //Method for Drivers. Drivers can see ONLY OPENED Orders.
+//    @GetMapping("/openedOrders")
+//    public List<Order> getOnlyOpenedOrders(){
+//        return orderService.getOnlyOpenedOrders();
+//    }
+//
+//    @GetMapping("/inProgressOrders")
+//    public List<Order> getOnlyInProgressOrders(){
+//        return orderService.getOnlyInProgressOrders();
+//    }
+//
+//    @GetMapping("/closedOrders")
+//    public List<Order> getOnlyClosedOrders(){
+//        return orderService.getOnlyClosedOrders();
+//    }
+//
+//    @GetMapping("/username/{username}")
+//    public List<Order> getOrdersByUsername(@PathVariable("username") String username){
+//        return orderService.getOrdersByUsername(username);
+//    }
 }

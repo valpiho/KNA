@@ -88,7 +88,7 @@ public class UserResource {
     public ResponseEntity<List<UserMiniDTO>> getAllUsers(@RequestHeader("Authorization") String token) {
         String username = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<User> users = userService.findAllUsers(username);
-        return new ResponseEntity<>(mapper.convertToListOfUserMiniDTO(users), OK);
+        return new ResponseEntity<>(mapper.toListOfUserMiniDTO(users), OK);
     }
 
     @GetMapping("/users/{username}")

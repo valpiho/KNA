@@ -10,7 +10,6 @@ import com.pibox.kna.service.dto.OrderDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,8 +25,8 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<Order> getClientOrders(String authUsername) {
+        return orderRepository.findAllByUsername(authUsername);
     }
 
     public Order addNewOrder(String authUsername, OrderDTO orderDto) {
@@ -72,54 +71,55 @@ public class OrderService {
     }
 
     //Method for drivers
-    public List<Order> getOnlyOpenedOrders() {
-        List<Order> allOrders = getAllOrders();
-        List<Order> openedOrders = new ArrayList<>();
-        int quantityOfOpenedOrders = 0;
-        for (Order order : allOrders) {
-            if (order.getStatus().equals(Status.OPENED)) {
-                openedOrders.add(order);
-                quantityOfOpenedOrders++;
-            }
-        }
-        System.out.println(quantityOfOpenedOrders);
-        return openedOrders;
-    }
+//    public List<Order> getOnlyOpenedOrders() {
+//        List<Order> allOrders = getAllOrders();
+//        List<Order> openedOrders = new ArrayList<>();
+//        int quantityOfOpenedOrders = 0;
+//        for (Order order : allOrders) {
+//            if (order.getStatus().equals(Status.OPENED)) {
+//                openedOrders.add(order);
+//                quantityOfOpenedOrders++;
+//            }
+//        }
+//        System.out.println(quantityOfOpenedOrders);
+//        return openedOrders;
+//    }
 
-    public List<Order> getOnlyInProgressOrders() {
-        List<Order> allOrders = getAllOrders();
-        List<Order> inProgressOrders = new ArrayList<>();
-        int quantityOfInProgressOrders = 0;
-        for (Order order : allOrders) {
-            if (order.getStatus().equals(Status.IN_PROGRESS)) {
-                inProgressOrders.add(order);
-                quantityOfInProgressOrders++;
-            }
-        }
-        System.out.println(quantityOfInProgressOrders);
-        return inProgressOrders;
-    }
+//    public List<Order> getOnlyInProgressOrders() {
+//        List<Order> allOrders = getAllOrders();
+//        List<Order> inProgressOrders = new ArrayList<>();
+//        int quantityOfInProgressOrders = 0;
+//        for (Order order : allOrders) {
+//            if (order.getStatus().equals(Status.IN_PROGRESS)) {
+//                inProgressOrders.add(order);
+//                quantityOfInProgressOrders++;
+//            }
+//        }
+//        System.out.println(quantityOfInProgressOrders);
+//        return inProgressOrders;
+//    }
 
-    public List<Order> getOnlyClosedOrders() {
-        List<Order> allOrders = getAllOrders();
-        List<Order> closedOrders = new ArrayList<>();
-        int quantityOfClosedOrders = 0;
-        for (Order order : allOrders) {
-            if (order.getStatus().equals(Status.CLOSED)) {
-                closedOrders.add(order);
-                quantityOfClosedOrders++;
-            }
-        }
-        System.out.println(quantityOfClosedOrders);
-        return closedOrders;
-    }
 
-    public List<Order> getOrdersByUsername(String username) {
-        List<Order> allOrders = getAllOrders();
-        List<Order> orderListByUsername = new ArrayList<>();
-        User user = userRepository.findUserByUsername(username);
-        return orderListByUsername;
-    }
+//    public List<Order> getOnlyClosedOrders() {
+//        List<Order> allOrders = getAllOrders();
+//        List<Order> closedOrders = new ArrayList<>();
+//        int quantityOfClosedOrders = 0;
+//        for (Order order : allOrders) {
+//            if (order.getStatus().equals(Status.CLOSED)) {
+//                closedOrders.add(order);
+//                quantityOfClosedOrders++;
+//            }
+//        }
+//        System.out.println(quantityOfClosedOrders);
+//        return closedOrders;
+//    }
+
+//    public List<Order> getOrdersByUsername(String username) {
+//        List<Order> allOrders = getAllOrders();
+//        List<Order> orderListByUsername = new ArrayList<>();
+//        User user = userRepository.findUserByUsername(username);
+//        return orderListByUsername;
+//    }
 
     //for method addNewOrder
     private String generateQRCode() {
