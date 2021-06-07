@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.pibox.kna.constants.OrderConstant.ORDER_DELETED_SUCCESSFULLY;
+import static com.pibox.kna.constants.OrderConstant.ORDER_UPDATED_SUCCESSFULLY;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
@@ -45,7 +46,7 @@ public class OrderResource {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResMiniDTO>> getOrders(@RequestHeader("Authorization") String token){
+    public ResponseEntity<List<OrderResMiniDTO>> getOrders(@RequestHeader("Authorization") String token) {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<Order> orders = orderService.getClientOrders(authUsername);
         return new ResponseEntity<>(mapper.toListOfOrderResMiniDTO(orders), OK);
@@ -77,6 +78,15 @@ public class OrderResource {
             throws NotFoundException {
         Order order = orderService.getOrderByQrCode(qrCode);
         return new ResponseEntity<>(mapper.toOrderResDto(order), OK);
+    }
+
+    @PatchMapping("/{qrCode}")
+    public ResponseEntity<HttpResponse> updateOrderStatus(@PathVariable("qrCode") String qrCode,
+                                                          @RequestHeader("Authorization") String token)
+            throws NotFoundException {
+        String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
+        orderService.updateOrderStatus(authUsername, qrCode);
+        return response(OK, ORDER_UPDATED_SUCCESSFULLY);
     }
 
     @DeleteMapping("/{qrCode}")

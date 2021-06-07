@@ -4,6 +4,7 @@ import com.pibox.kna.domain.Enumeration.Role;
 import com.pibox.kna.domain.Enumeration.Status;
 import com.pibox.kna.domain.Order;
 import com.pibox.kna.domain.User;
+import com.pibox.kna.exceptions.domain.BadRequestException;
 import com.pibox.kna.exceptions.domain.NotFoundException;
 import com.pibox.kna.repository.OrderRepository;
 import com.pibox.kna.repository.UserRepository;
@@ -71,6 +72,37 @@ public class OrderService {
 
     public List<Order> getAllOpenedOrders() {
         return orderRepository.getAllOpenOrders();
+    }
+
+    public void updateOrderStatus(String authUsername, String qrCode) throws NotFoundException {
+        User user = userRepository.findUserByUsername(authUsername);
+        Order order = orderRepository.findOrderByQrCode(qrCode);
+        if (order == null) {
+            throw new NotFoundException(NO_ORDER_FOUND_BY_QRCODE + qrCode);
+        }
+        if (!order.getCreatedBy().getUser().equals(user) && !user.getRole().equals(Role.ROLE_ADMIN.name())) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+        }
+        if (order.getStatus().equals(Status.OPEN)
+                && user.getRole().equals(Role.ROLE_DRIVER.name())) {
+            order.setStatus(Status.IN_PROGRESS);
+            order.setShippedAt(new Date());
+            order.setDriver(user.getDriver());
+            orderRepository.save(order);
+        } else if (order.getStatus().equals(Status.OPEN) && user.getRole().equals(Role.ROLE_CLIENT.name())) {
+            order.setStatus(Status.CLOSED);
+            order.setReceivedAt(new Date());
+            orderRepository.save(order);
+        } else if (order.getStatus().equals(Status.IN_PROGRESS)
+                && (user.getRole().equals(Role.ROLE_CLIENT.name())
+                || user.getRole().equals(Role.ROLE_DRIVER.name())
+                || user.getRole().equals(Role.ROLE_ADMIN.name()))) {
+            order.setStatus(Status.CLOSED);
+            order.setReceivedAt(new Date());
+            orderRepository.save(order);
+        } else {
+            throw new BadRequestException("Order is closed already");
+        }
     }
 
     public void deleteOrderByQrCode(String authUsername, String qrCode) throws NotFoundException {
