@@ -19,12 +19,14 @@ public class Order {
     private String qrCode;
     private String title;
     private String description;
-    private Boolean isInbound;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date createdAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date shippedAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date receivedAt;
     private Status status;
     private Boolean isActive;
+
+    @ManyToOne
+    private Client createdBy;
 
     @ManyToOne
     private Client fromClient;
@@ -35,4 +37,14 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "driver_id", referencedColumnName = "id")
     private Driver driver;
+
+    public void setFromClient(Client client) {
+        this.fromClient = client;
+        client.addOutboundOrder(this);
+    }
+
+    public void setToClient(Client client) {
+        this.toClient = client;
+        client.addInboundOrder(this);
+    }
 }

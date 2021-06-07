@@ -1,7 +1,7 @@
 package com.pibox.kna.domain.Enumeration;
 
 public enum Status {
-    OPENED,
+    OPEN,
     IN_PROGRESS,
     CLOSED
 }

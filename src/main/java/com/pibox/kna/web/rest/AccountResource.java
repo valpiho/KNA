@@ -52,7 +52,7 @@ public class AccountResource {
     @PatchMapping
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String token,
                                         @Valid @RequestBody UserDTO userDTO)
-            throws UserNotFoundException, EmailExistException, UsernameExistException {
+            throws NotFoundException, EmailExistException, UsernameExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         User updatedUser = userService.updateUser(authUsername, userDTO);
         return getResponseEntity(updatedUser);
@@ -62,7 +62,7 @@ public class AccountResource {
     public ResponseEntity<List<UserMiniDTO>> getUserContacts(@RequestHeader("Authorization") String token) {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         List<User> contacts = userService.findUserByUsername(authUsername).getContacts();
-        return new ResponseEntity<>(mapper.convertToListOfUserMiniDTO(contacts), OK);
+        return new ResponseEntity<>(mapper.toListOfUserMiniDTO(contacts), OK);
     }
 
     @PatchMapping("/contacts/add")
@@ -70,7 +70,7 @@ public class AccountResource {
                                                    @RequestParam("username") @Size(
                                                            min = 2, max = 20, message = "Must be between 2 and 20 characters")
                                                            String username)
-            throws UserNotFoundException, UserExistException {
+            throws NotFoundException, UserExistException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         accountService.addContact(authUsername, username);
         return response(OK, "Contact successfully added");
@@ -81,7 +81,7 @@ public class AccountResource {
                                                       @RequestParam("username") @Size(
                                                               min = 2, max = 20, message = "Must be between 2 and 20 characters")
                                                               String username)
-            throws UserNotFoundException {
+            throws NotFoundException {
         String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
         accountService.removeContact(authUsername, username);
         return response(OK, "Contact successfully removed");

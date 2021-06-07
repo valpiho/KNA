@@ -78,8 +78,8 @@ public class ExceptionHandling {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException exception) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<HttpResponse> userNotFoundException(NotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
