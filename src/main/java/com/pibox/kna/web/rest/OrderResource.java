@@ -47,19 +47,10 @@ public class OrderResource {
         return new ResponseEntity<>(mapper.toOrderResDto(order), CREATED);
     }
 
-    @GetMapping("/id/{id}")
-    public Order getOrderById(@PathVariable("id") Long id){
-        return orderService.getOrderById(id);
-    }
-
-    @GetMapping("/title/{title}")
-    public Order getOrderByTitle(@PathVariable("title") String title){
-        return orderService.getOrderByTitle(title);
-    }
-
     @GetMapping("/{qrCode}")
-    public Order getOrderByQrCode(@PathVariable("qrCode") String qrCode){
-        return orderService.getOrderByQrCode(qrCode);
+    public ResponseEntity<OrderResDTO> getOrderById(@PathVariable("qrCode") String qrCode){
+        Order order = orderService.getOrderByQrCode(qrCode);
+        return new ResponseEntity<>(mapper.toOrderResDto(order), OK);
     }
 
     @DeleteMapping("/delete/{qrCode}")

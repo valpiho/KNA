@@ -1,7 +1,6 @@
 package com.pibox.kna.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pibox.kna.domain.Enumeration.OrderType;
 import com.pibox.kna.domain.Enumeration.Status;
 import lombok.*;
 
@@ -24,7 +23,6 @@ public class Order {
     @JsonFormat(pattern = "dd/MM/yyyy") private Date shippedAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date receivedAt;
     private Status status;
-    private OrderType orderType;
     private Boolean isActive;
 
     @ManyToOne
@@ -43,7 +41,7 @@ public class Order {
     }
 
     public void setToClient(Client client) {
-        this.fromClient = client;
+        this.toClient = client;
         client.addOrder(this);
     }
 }

@@ -1,6 +1,5 @@
 package com.pibox.kna.service;
 
-import com.pibox.kna.domain.Enumeration.OrderType;
 import com.pibox.kna.domain.Enumeration.Status;
 import com.pibox.kna.domain.Order;
 import com.pibox.kna.domain.User;
@@ -41,11 +40,9 @@ public class OrderService {
         newOrder.setIsActive(true);
         newOrder.setCreatedAt(new Date());
         if (orderDto.getIsInbound()) {
-            newOrder.setOrderType(OrderType.INBOUND);
             newOrder.setFromClient(user.getClient());
             newOrder.setToClient(authUser.getClient());
         } else {
-            newOrder.setOrderType(OrderType.OUTBOUND);
             newOrder.setFromClient(authUser.getClient());
             newOrder.setToClient(user.getClient());
         }

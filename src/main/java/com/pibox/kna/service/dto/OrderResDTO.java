@@ -14,7 +14,6 @@ public class OrderResDTO {
     @JsonFormat(pattern = "dd/MM/yyyy") private Date createdAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date shippedAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date receivedAt;
-    private String orderType;
     private String status;
     private boolean isActive;
     private ClientDTO fromClientUser;
