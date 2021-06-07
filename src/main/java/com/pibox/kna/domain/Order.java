@@ -26,6 +26,9 @@ public class Order {
     private Boolean isActive;
 
     @ManyToOne
+    private Client createdBy;
+
+    @ManyToOne
     private Client fromClient;
 
     @ManyToOne
@@ -37,11 +40,11 @@ public class Order {
 
     public void setFromClient(Client client) {
         this.fromClient = client;
-        client.addOrder(this);
+        client.addOutboundOrder(this);
     }
 
     public void setToClient(Client client) {
         this.toClient = client;
-        client.addOrder(this);
+        client.addInboundOrder(this);
     }
 }

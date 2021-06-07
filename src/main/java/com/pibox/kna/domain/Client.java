@@ -23,14 +23,13 @@ public class Client {
     private String zipCode;
 
     @OneToOne(mappedBy = "client")
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "kna_clients_orders",
-            joinColumns = @JoinColumn(name = "order_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"))
-    private List<Order> orders = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Order> inboundOrders = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Order> outboundOrders = new ArrayList<>();
 
     public Client() { }
 
@@ -43,7 +42,11 @@ public class Client {
         this.zipCode = zipCode;
     }
 
-    public void addOrder(Order order) {
-        this.orders.add(order);
+    public void addInboundOrder(Order order) {
+        this.inboundOrders.add(order);
+    }
+
+    public void addOutboundOrder(Order order) {
+        this.outboundOrders.add(order);
     }
 }

@@ -24,10 +24,6 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
-    public List<Order> getClientOrders(String authUsername) {
-        return orderRepository.findAllByUsername(authUsername);
-    }
-
     public Order addNewOrder(String authUsername, OrderDTO orderDto) {
         User authUser = userRepository.findUserByUsername(authUsername);
         User user = userRepository.findUserByUsername(orderDto.getUsername());
@@ -39,6 +35,7 @@ public class OrderService {
         newOrder.setStatus(Status.OPENED);
         newOrder.setIsActive(true);
         newOrder.setCreatedAt(new Date());
+        newOrder.setCreatedBy(authUser.getClient());
         if (orderDto.getIsInbound()) {
             newOrder.setFromClient(user.getClient());
             newOrder.setToClient(authUser.getClient());
@@ -50,16 +47,12 @@ public class OrderService {
         return newOrder;
     }
 
-    public Order getOrderById(Long id){
-        return orderRepository.findById(id).orElse(null);
-    }
-
-    public Order getOrderByTitle(String title) {
-        return orderRepository.findOrderByTitle(title);
-    }
-
     public Order getOrderByQrCode(String qrCode){
         return orderRepository.findOrderByQrCode(qrCode);
+    }
+
+    public List<Order> getClientOrders(String authUsername) {
+        return orderRepository.findAllByUsername(authUsername);
     }
 
     public void deleteOrderByQrCode(String qrCode){

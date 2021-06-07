@@ -14,7 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Order findOrderByQrCode(String qrCode);
 
-    @Query("SELECT u.orders FROM Client u WHERE u.user.username = ?1")
+    @Query("SELECT u FROM Order u WHERE u.createdBy.user.username = ?1")
     List<Order> findAllByUsername(String username);
 
 
