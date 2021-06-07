@@ -18,6 +18,4 @@ public class DriverDTO {
     private String driverPlateNumber;
     private boolean isActive;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date joinDate;
-    private String role;
-    private String[] authorities;
 }

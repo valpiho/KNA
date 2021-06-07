@@ -7,7 +7,7 @@ import java.util.*;
 
 @Data
 @Entity
-@Table(name = "kna_user")
+@Table(name = "kna_users")
 public class User {
 
     @Id
