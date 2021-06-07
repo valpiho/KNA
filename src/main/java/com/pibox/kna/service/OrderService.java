@@ -1,14 +1,14 @@
 package com.pibox.kna.service;
 
-import com.pibox.kna.domain.Enumeration.Role;
+import com.pibox.kna.domain.Client;
 import com.pibox.kna.domain.Enumeration.Status;
 import com.pibox.kna.domain.Order;
 import com.pibox.kna.domain.User;
 import com.pibox.kna.repository.ClientRepository;
 import com.pibox.kna.repository.OrderRepository;
 import com.pibox.kna.repository.UserRepository;
+import com.pibox.kna.service.dto.OrderDTO;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,29 +18,42 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ClientRepository clientRepository;
+    public OrderService(OrderRepository orderRepository,
+                        UserRepository userRepository,
+                        ClientRepository clientRepository) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
+    }
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    public Order addNewOrder(Order order) {
+    public Order addNewOrder(String authUsername, OrderDTO orderDto) {
+        User authUser = userRepository.findUserByUsername(authUsername);
+        User user = userRepository.findUserByUsername(orderDto.getUsername());
         Order newOrder = new Order();
         String qrCode = generateQRCode();
         newOrder.setQrCode(qrCode);
-        newOrder.setTitle(order.getTitle());
-        newOrder.setDescription(order.getDescription());
+        newOrder.setTitle(orderDto.getTitle());
+        newOrder.setDescription(orderDto.getDescription());
         newOrder.setStatus(Status.OPENED);
         newOrder.setIsActive(true);
         newOrder.setCreatedAt(new Date());
+        if (orderDto.getIsInbound()) {
+            newOrder.setFromClient(user.getClient());
+            newOrder.setToClient(authUser.getClient());
+        } else {
+            newOrder.setFromClient(authUser.getClient());
+            newOrder.setToClient(user.getClient());
+        }
         orderRepository.save(newOrder);
+
         return newOrder;
     }
 

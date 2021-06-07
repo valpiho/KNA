@@ -7,13 +7,9 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Date;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Entity
-@Table(name = "kna_order")
+@Table(name = "kna_orders")
 public class Order {
 
     @Id
@@ -23,6 +19,7 @@ public class Order {
     private String qrCode;
     private String title;
     private String description;
+    private Boolean isInbound;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date createdAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date shippedAt;
     @JsonFormat(pattern = "dd/MM/yyyy") private Date receivedAt;
@@ -30,8 +27,10 @@ public class Order {
     private Boolean isActive;
 
     @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    private Client client;
+    private Client fromClient;
+
+    @ManyToOne
+    private Client toClient;
 
     @ManyToOne
     @JoinColumn(name = "driver_id", referencedColumnName = "id")

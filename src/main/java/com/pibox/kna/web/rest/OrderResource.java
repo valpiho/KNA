@@ -1,27 +1,47 @@
 package com.pibox.kna.web.rest;
 
 import com.pibox.kna.domain.Order;
+import com.pibox.kna.security.jwt.JWTTokenProvider;
 import com.pibox.kna.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pibox.kna.service.dto.OrderDTO;
+import com.pibox.kna.service.dto.OrderResDTO;
+import com.pibox.kna.service.utility.MapperService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderResource {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+    private final JWTTokenProvider jwtTokenProvider;
+    private final MapperService mapper;
+
+    public OrderResource(OrderService orderService,
+                         JWTTokenProvider jwtTokenProvider,
+                         MapperService mapper) {
+        this.orderService = orderService;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.mapper = mapper;
+    }
 
     @GetMapping("/all")
     public List<Order> getAllOrders(){
         return orderService.getAllOrders();
     }
 
-    @PostMapping("/add")
-    public Order addNewOrder(@RequestBody Order order){
-        return orderService.addNewOrder(order);
+    @PostMapping
+    @PreAuthorize("hasAnyAuthority('client:create')")
+    public ResponseEntity<OrderResDTO> addNewOrder(@RequestBody OrderDTO orderDto,
+                                                   @RequestHeader("Authorization") String token) {
+        String authUsername = jwtTokenProvider.getUsernameFromDecodedToken(token);
+        Order order = orderService.addNewOrder(authUsername, orderDto);
+        return new ResponseEntity<>(mapper.toOrderResDto(order), CREATED);
     }
 
     @GetMapping("/id/{id}")

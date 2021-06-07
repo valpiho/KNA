@@ -3,11 +3,11 @@ package com.pibox.kna.domain;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "kna_driver")
+@Table(name = "kna_drivers")
 public class Driver {
 
     @Id
@@ -17,10 +17,11 @@ public class Driver {
     private String plateNumber;
 
     @OneToOne(mappedBy = "driver")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY)
-    private Set<Order> orders;
+    private List<Order> orders;
 
     public Driver() { }
 

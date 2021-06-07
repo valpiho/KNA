@@ -3,11 +3,12 @@ package com.pibox.kna.domain;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "kna_client")
+@Table(name = "kna_clients")
 public class Client {
 
     @Id
@@ -22,10 +23,14 @@ public class Client {
     private String zipCode;
 
     @OneToOne(mappedBy = "client")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
-    private Set<Order> orders;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "kna_clients_orders",
+            joinColumns = @JoinColumn(name = "order_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"))
+    private List<Order> orders = new ArrayList<>();
 
     public Client() { }
 
