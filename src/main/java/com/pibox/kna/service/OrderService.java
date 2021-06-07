@@ -65,6 +65,10 @@ public class OrderService {
         return orderRepository.findAllByUsername(authUsername);
     }
 
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
     public void deleteOrderByQrCode(String authUsername, String qrCode) throws NotFoundException {
         Order order = orderRepository.findOrderByQrCode(qrCode);
         User user = userRepository.findUserByUsername(authUsername);
