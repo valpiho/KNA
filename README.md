@@ -1,11 +1,11 @@
 # Demo app for Kuehne Nagel Internship
 RESTful Back-end Spring Boot application for mobile app https://github.com/CrazyGaffer/SQUFF3.0
 
-In this application Users can register as Client or Driver
-Clients can add or remove other Clients or Drivers to their contacts list
-Clients can create inbound or outbound orders
-Clients can send or recieve orders
-Drivers can take orders to fullfil the shipment from one Client to another
+In this application Users can register as Client or Driver <br>
+Clients can add or remove other Clients or Drivers to their contacts list <br>
+Clients can create inbound or outbound orders <br>
+Clients can send or recieve orders <br>
+Drivers can take orders to fullfil the shipment from one Client to another <br>
 
 Java 11 
 Spring Boot 2.5.0 
