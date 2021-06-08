@@ -13,7 +13,7 @@ PosgreSQL  <br>
 H2 for dev and tests <br>
 AWS
 
-
+Docker image is available here **piboxtln/spring-kna:v2**
 
 ### List of API end points:
 
