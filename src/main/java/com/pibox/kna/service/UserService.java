@@ -85,7 +85,6 @@ public class UserService implements UserDetailsService {
         }
         userRepository.save(user);
         mailService.sendNewPasswordEmail(userDTO.getFirstName(), password, userDTO.getEmail());
-        System.out.println(password);
     }
 
     public User updateUser(String username, UserDTO userDTO)
