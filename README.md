@@ -7,10 +7,10 @@ Clients can create inbound or outbound orders <br>
 Clients can send or recieve orders <br>
 Drivers can take orders to fullfil the shipment from one Client to another <br>
 
-Java 11 
-Spring Boot 2.5.0 
-PosgreSQL 
-H2 for dev and tests
+Java 11  <br>
+Spring Boot 2.5.0  <br>
+PosgreSQL  <br>
+H2 for dev and tests <br>
 AWS
 
 
