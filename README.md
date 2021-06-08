@@ -25,7 +25,7 @@ Email with the new password will be sent
 - **GET**      http://localhost:8080/api/v1/reset-password/{email} <br>
 Email with the new password will be sent
 
-=======================================================================================
+==========================================================================
 
 - **GET**      http://localhost:8080/api/v1/account <br>
 Get User account details - for authenticated user
@@ -42,7 +42,7 @@ Add user with username to authenticated user contacts list
 - **PATCH**    http://localhost:8080/api/v1/account/contacts/remove?username={username} <br>
 Remove user with username from authenticated user contacts list
 
-=======================================================================================
+==========================================================================
 
 - **GET**      http://localhost:8080/api/v1/users <br>
 Get all users except authenticated user
@@ -59,7 +59,7 @@ For Admin only - Update user with username
 - **DELETE**   http://localhost:8080/api/v1/users/{username} <br>
 For Admin only - Delete user with username
 
-=======================================================================================
+==========================================================================
 
 - **GET**      http://localhost:8080/api/v1/orders <br>
 Get Orders by authenticated User
