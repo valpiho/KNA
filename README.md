@@ -1,6 +1,9 @@
 # Demo app for Kuehne Nagel Internship
 RESTful Back-end Spring Boot application for mobile app https://github.com/CrazyGaffer/SQUFF3.0
 
+**AWS link** <br>
+http://kna-env.eba-venipq2h.eu-central-1.elasticbeanstalk.com/
+
 In this application Users can register as Client or Driver <br>
 Clients can add or remove other Clients or Drivers to their contacts list <br>
 Clients can create inbound or outbound orders <br>
