@@ -12,78 +12,81 @@ Drivers can take orders to fullfil the shipment from one Client to another <br>
 
 Java 11  <br>
 Spring Boot 2.5.0  <br>
+Maven
 PosgreSQL for production <br>
 H2 for dev and tests <br>
-AWS (Elastic Beanstalk + RDS)
+AWS (Elastic Beanstalk + RDS)<br>
+
+**Angular v12 (Soon)**
 
 Docker image is available here **piboxtln/spring-kna:v1**
 
 ### List of API end points:
 
-- **POST**     http://localhost:8080/api/v1/login <br>
+- **POST**     /api/v1/login <br>
 
-- **POST**     http://localhost:8080/api/v1/register <br>
+- **POST**     /api/v1/register <br>
 Email with the new password will be sent
 
-- **GET**      http://localhost:8080/api/v1/reset-password/{email} <br>
+- **GET**      /api/v1/reset-password/{email} <br>
 Email with the new password will be sent
 
 ==========================================================================
 
-- **GET**      http://localhost:8080/api/v1/account <br>
+- **GET**      /api/v1/account <br>
 Get User account details - for authenticated user
 
-- **PATCH**    http://localhost:8080/api/v1/account <br>
+- **PATCH**    /api/v1/account <br>
 Update User account details - for authenticated user
 
-- **GET**      http://localhost:8080/api/v1/account/contacts <br>
+- **GET**      /api/v1/account/contacts <br>
 Get users contacts list - for authenticated user
 
-- **PATCH**    http://localhost:8080/api/v1/account/contacts/add?username={username} <br>
+- **PATCH**    /api/v1/account/contacts/add?username={username} <br>
 Add user with username to authenticated user contacts list
 
-- **PATCH**    http://localhost:8080/api/v1/account/contacts/remove?username={username} <br>
+- **PATCH**    /api/v1/account/contacts/remove?username={username} <br>
 Remove user with username from authenticated user contacts list
 
 ==========================================================================
 
-- **GET**      http://localhost:8080/api/v1/users <br>
+- **GET**      /api/v1/users <br>
 Get all users except authenticated user
 
-- **GET**      http://localhost:8080/api/v1/users/{username} <br>
+- **GET**      /api/v1/users/{username} <br>
 Get user with username
 
-- **POST**     http://localhost:8080/api/v1/users <br>
+- **POST**     /api/v1/users <br>
 For Admin only - Create new user
 
-- **PATCH**    http://localhost:8080/api/v1/users/{username} <br>
+- **PATCH**    /api/v1/users/{username} <br>
 For Admin only - Update user with username
 
-- **DELETE**   http://localhost:8080/api/v1/users/{username} <br>
+- **DELETE**   /api/v1/users/{username} <br>
 For Admin only - Delete user with username
 
 ==========================================================================
 
-- **GET**      http://localhost:8080/api/v1/orders <br>
+- **GET**      /api/v1/orders <br>
 Get Orders by authenticated User
 
-- **GET**      http://localhost:8080/api/v1/orders/all <br>
+- **GET**      /api/v1/orders/all <br>
 For Admin only - Get all Orders
 
-- **GET**      http://localhost:8080/api/v1/orders/open <br>
+- **GET**      /api/v1/orders/open <br>
 For Drivers only - Get all Orders with Open Status
 
-- **GET**      http://localhost:8080/api/v1/orders/{username} <br>
+- **GET**      /api/v1/orders/{username} <br>
 For Admin only - Get all Orders by User username
 
-- **PATCH**    http://localhost:8080/api/v1/orders/{qrCode} <br>
+- **PATCH**    /api/v1/orders/{qrCode} <br>
 Update Order Status
 
-- **POST**     http://localhost:8080/api/v1/orders <br>
+- **POST**     /api/v1/orders <br>
 For Clients only - Create new Order
 
-- **GET**      http://localhost:8080/api/v1/orders/{qrCode} <br>
+- **GET**      /api/v1/orders/{qrCode} <br>
 Get Order by qrCode
 
-- **DELETE**   http://localhost:8080/api/v1/orders/{qrCode} <br>
+- **DELETE**   /api/v1/orders/{qrCode} <br>
 For Admin or User created by - Delete Order by qrCode
