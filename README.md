@@ -12,11 +12,11 @@ Drivers can take orders to fullfil the shipment from one Client to another <br>
 
 Java 11  <br>
 Spring Boot 2.5.0  <br>
-PosgreSQL  <br>
+PosgreSQL for production <br>
 H2 for dev and tests <br>
-AWS
+AWS (Elastic Beanstalk + RDS)
 
-Docker image is available here **piboxtln/spring-kna:v2**
+Docker image is available here **piboxtln/spring-kna:v1**
 
 ### List of API end points:
 
